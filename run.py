@@ -85,13 +85,13 @@ def expired_token_callback(expired_token):
     }), 401
 
 
-# @jwt.user_identity_loader
-# def user_identity_lookup(user):
-#     return {
-#         'username': user.username,
-#         'id': user.id,
-#         'email': user.email,
-#     }
+@jwt.user_identity_loader
+def user_identity_lookup(user):
+    return {
+        'id': user.id,
+        'username': user.username,
+        'email': user.email
+    }
 
 
 import resources, views, models
@@ -103,3 +103,4 @@ api.add_resource(resources.UserLogoutRefresh, '/logout/refresh')
 api.add_resource(resources.TokenRefresh, '/token/refresh')
 api.add_resource(resources.AllUsers, '/users')
 api.add_resource(resources.SecretResource, '/secret')
+api.add_resource(resources.UserChangePassword, '/password/change')

@@ -5,24 +5,27 @@ from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_r
 parser = reqparse.RequestParser()
 parser.add_argument('username', help = 'This field cannot be blank', required = True)
 parser.add_argument('password', help = 'This field cannot be blank', required = True)
+parser.add_argument(
+    'email', help='This field cannot be blank', required=True)
 
 
 class UserRegistration(Resource):
     def post(self):
         data = parser.parse_args()
         
-        if UserModel.find_by_username(data['username']):
-            return {'message': 'User {} already exists'.format(data['username'])}
+        if UserModel.find_by_username(data['username']) or UserModel.find_by_email(data['email']):
+            return {'message': "User with such username or email already exists"}, 400
         
         new_user = UserModel(
             username = data['username'],
+            email = data['email'],
             password = UserModel.generate_hash(data['password'])
         )
         
         # try:
         new_user.save_to_db()
-        access_token = create_access_token(identity = data['username'])
-        refresh_token = create_refresh_token(identity = data['username'])
+        access_token = create_access_token(identity = new_user)
+        refresh_token = create_refresh_token(identity = new_user)
         return {
             'message': 'User {} was created'.format(data['username']),
             'access_token': access_token,
@@ -32,22 +35,28 @@ class UserRegistration(Resource):
         #     return {'message': 'Something went wrong'}, 500
 
 
+login_parser = reqparse.RequestParser()
+login_parser.add_argument(
+    'username', help='This field cannot be blank', required=True)
+login_parser.add_argument(
+    'password', help='This field cannot be blank', required=True)
+
 class UserLogin(Resource):
     def post(self):
-        data = parser.parse_args()
+        data = login_parser.parse_args()
         current_user = UserModel.find_by_username(data['username'])
 
         if not current_user:
-            return {'message': 'User {} doesn\'t exist'.format(data['username'])}
-        
+            return {'message': 'User {} doesn\'t exist'.format(data['username'])}, 400
+
         if UserModel.verify_hash(data['password'], current_user.password):
-            access_token = create_access_token(identity = data['username'])
-            refresh_token = create_refresh_token(identity = data['username'])
+            access_token = create_access_token(identity=current_user)
+            refresh_token = create_refresh_token(identity=current_user)
             return {
                 'message': 'Logged in as {}'.format(current_user.username),
                 'access_token': access_token,
                 'refresh_token': refresh_token
-                }
+            }
         else:
             return {'message': 'Wrong credentials'}, 400
 
@@ -98,3 +107,29 @@ class SecretResource(Resource):
         return {
             'answer': 42
         }
+
+
+password_change_parser = reqparse.RequestParser()
+password_change_parser.add_argument(
+    'current_password', help='Please fill in your current password', required=True)
+password_change_parser.add_argument(
+    'new_password', help='Please fill in your new password', required=True)
+
+
+class UserChangePassword(Resource):
+    @jwt_required
+    def post(self):
+        data = password_change_parser.parse_args()
+
+        current_user = UserModel.find_by_username(get_jwt_identity()['username'])
+        if not current_user:
+            return {'message': 'Verification failed'}, 400
+
+        if UserModel.verify_hash(data['current_password'], current_user.password):
+            current_user.change_password(
+                UserModel.generate_hash(data['new_password']))
+            return {
+                'message': 'You have successfully changed your password!'
+            }
+        else:
+            return {'message': 'Wrong password'}, 400
