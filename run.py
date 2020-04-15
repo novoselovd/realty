@@ -19,14 +19,14 @@ CORS(app)
 api = Api(app, errors=errors)
 
 
-# app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-# app.config['MAIL_USERNAME'] = 'slidecurrence@gmail.com'
-# app.config['MAIL_PASSWORD'] = 'slidevaluehse'
-# app.config['MAIL_PORT'] = 465
-# app.config['MAIL_USE_SSL'] = True
-# app.config['MAIL_USE_TLS'] = False
-# app.config['PROPAGATE_EXCEPTIONS'] = True
-# mail = Mail(app)
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_USERNAME'] = 'slidecurrence@gmail.com'
+app.config['MAIL_PASSWORD'] = 'slidevaluehse'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_USE_TLS'] = False
+app.config['PROPAGATE_EXCEPTIONS'] = True
+mail = Mail(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://rtwktcfx:NITaFpgQWBqeHE-H7UyiyCoYE1AjIOZU@balarama.db.elephantsql.com:5432/rtwktcfx'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -104,3 +104,13 @@ api.add_resource(resources.TokenRefresh, '/token/refresh')
 api.add_resource(resources.AllUsers, '/users')
 api.add_resource(resources.SecretResource, '/secret')
 api.add_resource(resources.UserChangePassword, '/password/change')
+api.add_resource(resources.UserForgotPassword, '/password/forgot')
+api.add_resource(resources.UserResetPasswordViaEmail,
+                 '/password/forgot/reset/<token>')
+
+
+
+
+
+
+

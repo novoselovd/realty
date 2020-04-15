@@ -1,5 +1,12 @@
-from run import db
+from run import db, app, mail
 from passlib.hash import pbkdf2_sha256 as sha256
+from time import time
+import jwt
+from flask_mail import Message
+from flask import render_template, url_for, Response
+from sqlalchemy import and_, or_, not_
+import datetime
+import json
 
 class UserModel(db.Model):
     __tablename__ = 'users'
@@ -70,6 +77,32 @@ class UserModel(db.Model):
             update({UserModel.password: new_password},
                    synchronize_session=False)
         db.session.commit()
+
+    def get_reset_password_token(self, expires_in=60000):
+        return jwt.encode(
+            {'id': self.id, 'exp': time() + expires_in},
+            app.config['SECRET_KEY'], algorithm='HS256')
+
+    @staticmethod
+    def verify_reset_password_token(token):
+        try:
+            id = jwt.decode(token, app.config['SECRET_KEY'])['id']
+        except:
+            return
+        return db.session.query(UserModel).filter(UserModel.id == id).first()
+
+    @staticmethod
+    def send_password_reset_email(user):
+        token = user.get_reset_password_token()
+        msg = Message('Reset your password',
+                      sender='Realty', recipients=[user.email])
+        link = 'https://real-estate-research-6f694.firebaseapp.com/auth/restore-password?token=' + \
+            str(token)[2:-1]
+        msg.body = render_template('reset_password.txt',
+                                   user=user, link=link)
+        msg.html = render_template('reset_password.html',
+                                   user=user, link=link)
+        mail.send(msg)
 
 class RevokedTokenModel(db.Model):
     __tablename__ = 'revoked_tokens'

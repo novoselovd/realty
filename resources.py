@@ -133,3 +133,41 @@ class UserChangePassword(Resource):
             }
         else:
             return {'message': 'Wrong password'}, 400
+
+
+
+password_recover_parser = reqparse.RequestParser()
+password_recover_parser.add_argument(
+    'email', help='Please fill in your email address', required=True)
+
+
+class UserForgotPassword(Resource):
+    def post(self):
+        data = password_recover_parser.parse_args()
+
+        current_user = UserModel.find_by_email(data['email'])
+        if not current_user:
+            return {'message': 'User with such email doesn\'t exist'}, 400
+        UserModel.send_password_reset_email(current_user)
+        return {'message': "An e-mail was sent to {}. Follow the instructions to reset the password".format(data['email'])}
+
+
+after_confirmation_password_change_parser = reqparse.RequestParser()
+after_confirmation_password_change_parser.add_argument(
+    'new_password', help='Please fill in your new password', required=True)
+
+
+class UserResetPasswordViaEmail(Resource):
+    def post(self, token):
+        user = UserModel.verify_reset_password_token(token)
+        if not user:
+            return {'message': 'Verification failed. Please try again'}, 400
+        data = after_confirmation_password_change_parser.parse_args()
+        user.change_password(UserModel.generate_hash(data['new_password']))
+        access_token = create_access_token(identity=user)
+        refresh_token = create_refresh_token(identity=user)
+
+        return {'message': 'You have successfully changed your password!', 'access_token': access_token, 'refresh_token': refresh_token}, 200
+
+
+
