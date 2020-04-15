@@ -1,5 +1,3 @@
-# flask-jwt-auth
-
 ## How to run
 
 ``` bash
