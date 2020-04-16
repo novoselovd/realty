@@ -19,9 +19,9 @@ CORS(app)
 api = Api(app, errors=errors)
 
 
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_USERNAME'] = 'slidecurrence@gmail.com'
-app.config['MAIL_PASSWORD'] = 'slidevaluehse'
+app.config['MAIL_SERVER'] = 'smtp.yandex.ru'
+app.config['MAIL_USERNAME'] = 'realtyanalyzer'
+app.config['MAIL_PASSWORD'] = 'Stope123'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USE_SSL'] = True
 app.config['MAIL_USE_TLS'] = False

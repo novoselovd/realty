@@ -7,6 +7,13 @@ from flask import render_template, url_for, Response
 from sqlalchemy import and_, or_, not_
 import datetime
 import json
+from threading import Thread
+
+
+def async_send_mail(app, msg):
+    with app.app_context():
+        mail.send(msg)
+
 
 class UserModel(db.Model):
     __tablename__ = 'users'
@@ -95,14 +102,19 @@ class UserModel(db.Model):
     def send_password_reset_email(user):
         token = user.get_reset_password_token()
         msg = Message('Reset your password',
-                      sender='Realty', recipients=[user.email])
+                      sender='realtyanalyzer@yandex.ru', recipients=[user.email])
         link = 'https://real-estate-research-6f694.firebaseapp.com/auth/restore-password?token=' + \
             str(token)[2:-1]
         msg.body = render_template('reset_password.txt',
                                    user=user, link=link)
         msg.html = render_template('reset_password.html',
                                    user=user, link=link)
+        # thr = Thread(target=async_send_mail,  args=[app,  msg])
+        # thr.start()
+        # return thr
+
         mail.send(msg)
+
 
 class RevokedTokenModel(db.Model):
     __tablename__ = 'revoked_tokens'
