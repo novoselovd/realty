@@ -1,6 +1,9 @@
 from flask_restful import Resource, reqparse
-from models import UserModel, RevokedTokenModel
+from models import UserModel, RevokedTokenModel, SellModel
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
+from parser import update_db
+import json
+
 
 parser = reqparse.RequestParser()
 parser.add_argument('username', help = 'This field cannot be blank', required = True)
@@ -169,5 +172,16 @@ class UserResetPasswordViaEmail(Resource):
 
         return {'message': 'You have successfully changed your password!', 'access_token': access_token, 'refresh_token': refresh_token}, 200
 
+#TODO: сделать нормальный апдейт
+class UpdateDatabase(Resource):
+    def get(self):
+        update_db()
+        return {'message': 'Successfully updated db'}, 200
+
+
+class ReturnData(Resource):
+    @jwt_required
+    def get(self):
+        return [r.as_dict() for r in SellModel.query.all()], 200
 
 

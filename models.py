@@ -15,6 +15,11 @@ def async_send_mail(app, msg):
         mail.send(msg)
 
 
+class JsonModel(object):
+    def as_dict(self):
+       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
 class UserModel(db.Model):
     __tablename__ = 'users'
 
@@ -129,3 +134,51 @@ class RevokedTokenModel(db.Model):
     def is_jti_blacklisted(cls, jti):
         query = cls.query.filter_by(jti = jti).first()
         return bool(query)
+
+
+class SellModel(db.Model, JsonModel):
+    __tablename__ = 'sell'
+    id = db.Column(db.Integer, primary_key=True)
+    price = db.Column(db.Float)
+    address = db.Column(db.String(120))
+    area = db.Column(db.Float)
+    latitude = db.Column(db.Float)
+    longitude = db.Column(db.Float)
+    
+    def save_to_db(self):
+        db.session.add(self)
+        db.session.commit()
+
+    @classmethod
+    def find_by_id(cls, id):
+        return cls.query.filter_by(id=id).first()
+
+
+class RentModel(db.Model, JsonModel):
+    __tablename__ = 'rent'
+    id = db.Column(db.Integer, primary_key=True)
+    price = db.Column(db.Float)
+    address = db.Column(db.String(120))
+    area = db.Column(db.Float)
+    latitude = db.Column(db.Float)
+    longitude = db.Column(db.Float)
+
+    def save_to_db(self):
+        db.session.add(self)
+        db.session.commit()
+
+    @classmethod
+    def find_by_id(cls, id):
+        return cls.query.filter_by(id=id).first()
+
+
+
+
+
+
+
+
+
+
+
+
