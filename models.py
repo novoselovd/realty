@@ -121,6 +121,16 @@ class UserModel(db.Model):
         mail.send(msg)
 
 
+    @staticmethod
+    def send_feedback(name, email, subject, message):
+        msg = Message(subject,
+                      sender='realtyanalyzer@yandex.ru', recipients=['realtyanalyzer@yandex.ru'])
+        msg.body = name + ' ' + email + ' ' + message
+        msg.html = name + ' ' + email + ' ' + message
+
+        mail.send(msg)
+
+
 class RevokedTokenModel(db.Model):
     __tablename__ = 'revoked_tokens'
     id = db.Column(db.Integer, primary_key = True)
@@ -136,12 +146,21 @@ class RevokedTokenModel(db.Model):
         return bool(query)
 
 
-class SellModel(db.Model, JsonModel):
-    __tablename__ = 'sell'
+class RealtyModel(db.Model, JsonModel):
+    __tablename__ = 'realty'
     id = db.Column(db.Integer, primary_key=True)
+    type = db.Column(db.Integer)
+    url = db.Column(db.String(120))
     price = db.Column(db.Float)
+    phone = db.Column(db.String(120))
     address = db.Column(db.String(120))
+    metro = db.Column(db.String(120))
     area = db.Column(db.Float)
+    rooms_count = db.Column(db.Integer)
+    floor_number = db.Column(db.Integer)
+    floors_count = db.Column(db.Integer)
+    images = db.Column(db.Text)
+    city = db.Column(db.String(120))
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
     
@@ -153,32 +172,16 @@ class SellModel(db.Model, JsonModel):
     def find_by_id(cls, id):
         return cls.query.filter_by(id=id).first()
 
-
-class RentModel(db.Model, JsonModel):
-    __tablename__ = 'rent'
-    id = db.Column(db.Integer, primary_key=True)
-    price = db.Column(db.Float)
-    address = db.Column(db.String(120))
-    area = db.Column(db.Float)
-    latitude = db.Column(db.Float)
-    longitude = db.Column(db.Float)
-
-    def save_to_db(self):
-        db.session.add(self)
-        db.session.commit()
-
-    @classmethod
-    def find_by_id(cls, id):
-        return cls.query.filter_by(id=id).first()
+    @staticmethod
+    def autocomplete(address):
+        query = db.session.query(RealtyModel.address).filter(RealtyModel.address.ilike('%' + str(address) + '%'))
+        results = [r for r in query.all()]
+        return results
 
 
-
-
-
-
-
-
-
-
-
-
+    @staticmethod
+    def filter(floor=0, square=0.0, rooms=0):
+        query = db.session.query(RealtyModel).filter(and_(RealtyModel.rooms_count >= float(rooms), RealtyModel.floor_number >= float(floor),
+                                                          RealtyModel.area >= float(square)))
+        results = query.all()
+        return results

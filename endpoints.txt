@@ -16,3 +16,6 @@
 10) UserResetPasswordViaEmail. URL: /password/forgot/reset/<token>. Usage: POST-запрос с новым паролем. Токен декодируется,
 в случае успеха по нему определяется пользователь, запросивший смену пароля, пароль меняется на новый, выдаётся пара токенов.
 11) ReturnData. URL: /data. Usage: Требуется access_token, метод  GET. Возвращает список данных по квартирам из БД.
+12) Autocomplete. URL: /autocomplete. Usage: Требуется access_token, метод  GET и параметр adr(подстрока адреса). Возвращает список адресов из бд соответствующих запросу.
+13) FilterData. URL: /filter. Usage: Требуется access_token, метод  GET и параметры fl, sq, rms (этаж, площадь, кол-во комнат). Возвращает список квартир из бд соответствующих фильтру.
+14) Feedback. URL: /feedback. Usage: Метод  POST с email, name, subject, message.

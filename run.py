@@ -109,6 +109,10 @@ api.add_resource(resources.UserResetPasswordViaEmail,
                  '/password/forgot/reset/<token>')
 api.add_resource(resources.UpdateDatabase, '/update')
 api.add_resource(resources.ReturnData, '/data')
+api.add_resource(resources.Autocomplete, '/autocomplete')
+api.add_resource(resources.FilterData, '/filter')
+api.add_resource(resources.Feedback, '/feedback')
+
 
 
 
