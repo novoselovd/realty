@@ -81,7 +81,7 @@ class UserLogoutRefresh(Resource):
     def post(self):
         jti = get_raw_jwt()['jti']
         try:
-            revoked_token = RevokedTokenModel(jti = jti)
+            revoked_token = RevokedTokenModel(jti=jti)
             revoked_token.add()
             return {'message': 'Refresh token has been revoked'}
         except:
@@ -91,9 +91,20 @@ class UserLogoutRefresh(Resource):
 class TokenRefresh(Resource):
     @jwt_refresh_token_required
     def post(self):
-        current_user = get_jwt_identity()
-        access_token = create_access_token(identity = current_user)
-        return {'access_token': access_token}
+        jti = get_raw_jwt()['jti']
+        try:
+            current_user_identity = get_jwt_identity()
+            revoked_token = RevokedTokenModel(jti=jti)
+            revoked_token.add()
+            current_user = UserModel.find_by_username(current_user_identity['username'])
+            access_token = create_access_token(identity=current_user)
+            refresh_token = create_refresh_token(identity=current_user)
+            return {
+                'access_token': access_token,
+                'refresh_token': refresh_token
+            }, 200
+        except:
+            return {'message': 'Something went wrong'}, 500
 
 
 class AllUsers(Resource):
@@ -174,6 +185,7 @@ class UserResetPasswordViaEmail(Resource):
 
 #TODO: сделать нормальный апдейт
 class UpdateDatabase(Resource):
+    @jwt_required
     def get(self):
         update_db()
         return {'message': 'Successfully updated db'}, 200
