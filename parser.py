@@ -20,6 +20,7 @@ def update_db(price1, deal_id):
 				images = i['images'],
 				city = i['city'],
 				address = i['address'],
+				description = i['description'],
 				area = float(i['area']),
 				latitude = float(i['coords']['lat']),
 				longitude = float(i['coords']['lng'])

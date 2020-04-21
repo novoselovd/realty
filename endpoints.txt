@@ -19,3 +19,4 @@
 12) Autocomplete. URL: /autocomplete. Usage: Требуется access_token, метод  GET и параметр adr(подстрока адреса). Возвращает список адресов из бд соответствующих запросу.
 13) FilterData. URL: /filter. Usage: Требуется access_token, метод  GET и параметры fl, sq, rms (этаж, площадь, кол-во комнат). Возвращает список квартир из бд соответствующих фильтру.
 14) Feedback. URL: /feedback. Usage: Метод  POST с email, name, subject, message.
+15) RealtyById. URL: /realty/<id>. Usage: Требуется access_token, метод  GET и id объекта. Возвращает данные об объекте.

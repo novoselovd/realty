@@ -112,6 +112,8 @@ api.add_resource(resources.ReturnData, '/data')
 api.add_resource(resources.Autocomplete, '/autocomplete')
 api.add_resource(resources.FilterData, '/filter')
 api.add_resource(resources.Feedback, '/feedback')
+api.add_resource(resources.GetRealtyById, '/realty/<id>')
+api.add_resource(resources.CountSameAddresses, '/count')
 
 
 

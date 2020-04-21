@@ -1,6 +1,6 @@
 from flask_restful import Resource, reqparse
 from flask import request, jsonify
-from models import UserModel, RevokedTokenModel, RealtyModel
+from models import UserModel, RevokedTokenModel, RealtyModel, TempModel
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
 from parser import update_db
 import json
@@ -193,11 +193,11 @@ realty_parser.add_argument(
 
 
 class UpdateDatabase(Resource):
-    @jwt_required
+    # @jwt_required
     def get(self):
-        user_dict = get_jwt_identity()
-        if user_dict['username'] != 'dmitry':
-            return {'message': 'No access'}, 403
+        # user_dict = get_jwt_identity()
+        # if user_dict['username'] != 'dmitry':
+        #     return {'message': 'No access'}, 403
 
         data = realty_parser.parse_args()
         update_db(data['price'], data['deal_id'])
@@ -207,7 +207,7 @@ class UpdateDatabase(Resource):
 class ReturnData(Resource):
     @jwt_required
     def get(self):
-        return [r.as_dict() for r in RealtyModel.query.all()], 200
+        return [r.as_dict() for r in TempModel.query.all()], 200
 
 
 class FilterData(Resource):
@@ -245,3 +245,31 @@ class Feedback(Resource):
         UserModel.send_feedback(name, email, subject, message)
 
         return {'message': 'Thank you for contacting us!'}, 200
+
+
+class GetRealtyById(Resource):
+    @jwt_required
+    def get(self, id):
+        return RealtyModel.return_realty_by_id(id)
+
+
+class CountSameAddresses(Resource):
+    def get(self):
+        res = RealtyModel.find_addresses()
+
+        for i in res:
+            new_temp = TempModel(
+                id=i[0].id,
+                sell_url=i[0].url,
+                rent_url=i[1].url,
+                sell_price=i[0].price,
+                rent_price=i[1].price,
+                address=i[0].address,
+                area=i[0].area,
+                latitude=i[0].latitude,
+                longitude=i[0].longitude,
+                coeff=int(i[0].price/(12.0*i[1].price))
+            )
+
+            new_temp.save_to_db()
+        return {'test': 'test'}, 200

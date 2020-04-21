@@ -160,6 +160,7 @@ class RealtyModel(db.Model, JsonModel):
     floor_number = db.Column(db.Integer)
     floors_count = db.Column(db.Integer)
     images = db.Column(db.Text)
+    description = db.Column(db.Text)
     city = db.Column(db.String(120))
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
@@ -185,3 +186,72 @@ class RealtyModel(db.Model, JsonModel):
                                                           RealtyModel.area >= float(square)))
         results = query.all()
         return results
+
+    @staticmethod
+    def to_json(x):
+        return {
+            'id': x.id,
+            'type': x.type,
+            'url': x.url,
+            'price': x.price,
+            'description': x.description,
+            'phone': x.phone,
+            'address': x.address,
+            'metro': x.metro,
+            'area': x.area,
+            'rooms_count': x.rooms_count,
+            'floor_number': x.floor_number,
+            'floors_count': x.floors_count,
+            'images': x.images,
+            'city': x.city,
+            'latitude': x.latitude,
+            'longitude': x.longitude
+        }
+
+    @classmethod
+    def return_realty_by_id(cls, id):
+        return {'realty': cls.to_json(cls.find_by_id(id))}
+
+
+
+    @staticmethod
+    def find_addresses():
+        result = 0
+        latlon = []
+        sell = db.session.query(RealtyModel).filter(RealtyModel.type == 1).all()
+        rent = db.session.query(RealtyModel).filter(RealtyModel.type == 2).all()
+
+        res = []
+
+        for r in sell:
+            for q in rent:
+                if r.latitude == q.latitude and r.longitude == q.longitude and abs(r.area-q.area) < 5.0:
+                    if [r.latitude, r.longitude] not in latlon:
+                        latlon.append([r.latitude, r.longitude])
+                        result += 1
+                        res.append([r, q])
+
+        print(result)
+        return res
+
+
+class TempModel(db.Model, JsonModel):
+    __tablename__ = 'temp'
+    id = db.Column(db.Integer, primary_key=True)
+    sell_url = db.Column(db.String(120))
+    rent_url = db.Column(db.String(120))
+    sell_price = db.Column(db.Float)
+    rent_price = db.Column(db.Float)
+    coeff = db.Column(db.Integer)
+    address = db.Column(db.String(120))
+    area = db.Column(db.Float)
+    latitude = db.Column(db.Float)
+    longitude = db.Column(db.Float)
+
+    def save_to_db(self):
+        db.session.add(self)
+        db.session.commit()
+
+    @classmethod
+    def find_by_id(cls, id):
+        return cls.query.filter_by(id=id).first()
