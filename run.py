@@ -114,6 +114,10 @@ api.add_resource(resources.FilterData, '/filter')
 api.add_resource(resources.Feedback, '/feedback')
 api.add_resource(resources.GetRealtyById, '/realty/<id>')
 api.add_resource(resources.CountSameAddresses, '/count')
+api.add_resource(resources.CountAveragePayback, '/payback')
+api.add_resource(resources.RecordsCount, '/records')
+api.add_resource(resources.FlatsCount, '/flats')
+
 
 
 

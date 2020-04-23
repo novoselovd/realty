@@ -213,10 +213,10 @@ class ReturnData(Resource):
 class FilterData(Resource):
     @jwt_required
     def get(self):
-        floor = request.args.get('fl')
-        square = request.args.get('sq')
-        rooms = request.args.get('rms')
-        results = RealtyModel.filter(int(floor), float(square), int(rooms))
+        coeff = request.args.get('coeff')
+        square = request.args.get('square')
+        price = request.args.get('price')
+        results = TempModel.filter(square, coeff, price)
 
         return [r.as_dict() for r in results], 200
 
@@ -257,19 +257,58 @@ class CountSameAddresses(Resource):
     def get(self):
         res = RealtyModel.find_addresses()
 
-        for i in res:
-            new_temp = TempModel(
-                id=i[0].id,
-                sell_url=i[0].url,
-                rent_url=i[1].url,
-                sell_price=i[0].price,
-                rent_price=i[1].price,
-                address=i[0].address,
-                area=i[0].area,
-                latitude=i[0].latitude,
-                longitude=i[0].longitude,
-                coeff=int(i[0].price/(12.0*i[1].price))
-            )
+        for key, value in res.items():
+            realty = TempModel.find_by_latlon(key[0], key[1])
+            if not realty:
+                new_temp = TempModel(
+                    id=value[0].id,
+                    sell_url=value[0].url,
+                    rent_url=value[1].url,
+                    sell_price=value[0].price,
+                    rent_price=value[1].price,
+                    address=value[0].address,
+                    area=value[0].area,
+                    latitude=value[0].latitude,
+                    longitude=value[0].longitude,
+                    coeff=value[2]
+                )
 
-            new_temp.save_to_db()
-        return {'test': 'test'}, 200
+                new_temp.save_to_db()
+            else:
+                if realty.coeff > value[2]:
+                    realty.delete(realty.id)
+
+                    new_temp = TempModel(
+                        id=value[0].id,
+                        sell_url=value[0].url,
+                        rent_url=value[1].url,
+                        sell_price=value[0].price,
+                        rent_price=value[1].price,
+                        address=value[0].address,
+                        area=value[0].area,
+                        latitude=value[0].latitude,
+                        longitude=value[0].longitude,
+                        coeff=value[2]
+                    )
+
+                    new_temp.save_to_db()
+
+        return {'message': 'Successfully updated db!'}, 200
+
+
+class CountAveragePayback(Resource):
+    def get(self):
+        avg = TempModel.count_payback()
+        return {'Average payback period': avg}, 200
+
+
+class RecordsCount(Resource):
+    def get(self):
+        count = RealtyModel.count()
+        return {'Total records': count}, 200
+
+
+class FlatsCount(Resource):
+    def get(self):
+        count = TempModel.count()
+        return {'Total flats': count}, 200

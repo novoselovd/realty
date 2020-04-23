@@ -17,6 +17,9 @@
 в случае успеха по нему определяется пользователь, запросивший смену пароля, пароль меняется на новый, выдаётся пара токенов.
 11) ReturnData. URL: /data. Usage: Требуется access_token, метод  GET. Возвращает список данных по квартирам из БД.
 12) Autocomplete. URL: /autocomplete. Usage: Требуется access_token, метод  GET и параметр adr(подстрока адреса). Возвращает список адресов из бд соответствующих запросу.
-13) FilterData. URL: /filter. Usage: Требуется access_token, метод  GET и параметры fl, sq, rms (этаж, площадь, кол-во комнат). Возвращает список квартир из бд соответствующих фильтру.
+13) FilterData. URL: /filter. Usage: Требуется access_token, метод  GET и параметры square, coeff, price (площадь, кф. рентабельности, цена). Возвращает список квартир из бд соответствующих фильтру.
 14) Feedback. URL: /feedback. Usage: Метод  POST с email, name, subject, message.
 15) RealtyById. URL: /realty/<id>. Usage: Требуется access_token, метод  GET и id объекта. Возвращает данные об объекте.
+16) CountAveragePayback. URL: /payback. Usage: Метод GET. Возвращает среднюю окупаемость квартир по Москве.
+17) RecordsCount. URL: /records. Usage: Метод GET. Возвращает кол-во проанализированных объявлений.
+18) FlatsCount. URL: /flats. Usage: Метод GET. Возвращает кол-во жк с окупаемостью.

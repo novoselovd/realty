@@ -179,14 +179,6 @@ class RealtyModel(db.Model, JsonModel):
         results = [r for r in query.all()]
         return results
 
-
-    @staticmethod
-    def filter(floor=0, square=0.0, rooms=0):
-        query = db.session.query(RealtyModel).filter(and_(RealtyModel.rooms_count >= float(rooms), RealtyModel.floor_number >= float(floor),
-                                                          RealtyModel.area >= float(square)))
-        results = query.all()
-        return results
-
     @staticmethod
     def to_json(x):
         return {
@@ -213,25 +205,34 @@ class RealtyModel(db.Model, JsonModel):
         return {'realty': cls.to_json(cls.find_by_id(id))}
 
 
+    @staticmethod
+    def count():
+        return db.session.query(RealtyModel).count()
+
 
     @staticmethod
     def find_addresses():
         result = 0
-        latlon = []
+        # latlon = {}
         sell = db.session.query(RealtyModel).filter(RealtyModel.type == 1).all()
         rent = db.session.query(RealtyModel).filter(RealtyModel.type == 2).all()
 
-        res = []
+        res = {}
 
         for r in sell:
             for q in rent:
                 if r.latitude == q.latitude and r.longitude == q.longitude and abs(r.area-q.area) < 5.0:
-                    if [r.latitude, r.longitude] not in latlon:
-                        latlon.append([r.latitude, r.longitude])
+                    if tuple([r.latitude, r.longitude]) not in res:
+                        # latlon[tuple([r.latitude, r.longitude])] = int(r.price / (12.0 * q.price))
+                        res[tuple([r.latitude, r.longitude])] = [r, q, int(r.price / (12.0 * q.price))]
                         result += 1
-                        res.append([r, q])
+                    else:
+                        if res[tuple([r.latitude, r.longitude])][2] > int(r.price / (12.0 * q.price)):
+                            # latlon.pop(tuple([r.latitude, r.longitude]), None)
+                            res.pop(tuple([r.latitude, r.longitude]), None)
+                            # latlon[tuple([r.latitude, r.longitude])] = int(r.price / (12.0 * q.price))
+                            res[tuple([r.latitude, r.longitude])] = [r, q, int(r.price / (12.0 * q.price))]
 
-        print(result)
         return res
 
 
@@ -253,5 +254,35 @@ class TempModel(db.Model, JsonModel):
         db.session.commit()
 
     @classmethod
+    def delete(cls, id):
+        deleted = cls.query.filter_by(id=id).delete()
+        db.session.commit()
+
+    @classmethod
     def find_by_id(cls, id):
         return cls.query.filter_by(id=id).first()
+
+    @classmethod
+    def find_by_latlon(cls, lat, lon):
+        return cls.query.filter_by(latitude=lat, longitude=lon).first()
+
+
+    @staticmethod
+    def filter(square, coeff, price):
+        query = db.session.query(TempModel).filter(and_(TempModel.coeff >= float(coeff), TempModel.sell_price >= float(price),
+                                                          TempModel.area >= float(square)))
+        results = query.all()
+        return results
+
+    @staticmethod
+    def count():
+        return db.session.query(TempModel).count()
+
+    @staticmethod
+    def count_payback():
+        query = db.session.query(TempModel.coeff)
+        results = [r[0] for r in query.all()]
+
+        # print(results)
+        return round(sum(results)/len(results))
+
