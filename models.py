@@ -5,9 +5,27 @@ import jwt
 from flask_mail import Message
 from flask import render_template, url_for, Response
 from sqlalchemy import and_, or_, not_
+from sqlalchemy import func
+from sqlalchemy.ext.mutable import Mutable
+from sqlalchemy.dialects.postgresql import ARRAY
 import datetime
 import json
 from threading import Thread
+
+
+# class MutableList(Mutable, list):
+#     def append(self, value):
+#         list.append(self, value)
+#         self.changed()
+#
+#     @classmethod
+#     def coerce(cls, key, value):
+#         if not isinstance(value, MutableList):
+#             if isinstance(value, list):
+#                 return MutableList(value)
+#             return Mutable.coerce(key, value)
+#         else:
+#             return value
 
 
 def async_send_mail(app, msg):
@@ -268,9 +286,10 @@ class TempModel(db.Model, JsonModel):
 
 
     @staticmethod
-    def filter(square, coeff, price):
-        query = db.session.query(TempModel).filter(and_(TempModel.coeff >= float(coeff), TempModel.sell_price >= float(price),
-                                                          TempModel.area >= float(square)))
+    def filter(squareMin, squareMax, coeffMin, coeffMax, priceMin, priceMax):
+        query = db.session.query(TempModel).filter(and_(TempModel.coeff >= float(coeffMin), TempModel.coeff <= float(coeffMax),
+                                                        TempModel.sell_price >= float(priceMin), TempModel.sell_price <= float(priceMax),
+                                                        TempModel.area >= float(squareMin), TempModel.area <= float(squareMax)))
         results = query.all()
         return results
 
@@ -285,4 +304,24 @@ class TempModel(db.Model, JsonModel):
 
         # print(results)
         return round(sum(results)/len(results))
+
+    @staticmethod
+    def top():
+        query = db.session.query(TempModel).order_by(TempModel.coeff).limit(10)
+
+        return query
+
+    @staticmethod
+    def get_intervals():
+        coeffMax = db.session.query(func.max(TempModel.coeff)).scalar()
+        coeffMin = db.session.query(func.min(TempModel.coeff)).scalar()
+
+        squareMax = db.session.query(func.max(TempModel.area)).scalar()
+        squareMin = db.session.query(func.min(TempModel.area)).scalar()
+
+        priceMax = db.session.query(func.max(TempModel.sell_price)).scalar()
+        priceMin = db.session.query(func.min(TempModel.sell_price)).scalar()
+
+        return [coeffMin, coeffMax, squareMin, squareMax, priceMin, priceMax]
+
 

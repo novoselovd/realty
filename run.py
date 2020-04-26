@@ -117,6 +117,8 @@ api.add_resource(resources.CountSameAddresses, '/count')
 api.add_resource(resources.CountAveragePayback, '/payback')
 api.add_resource(resources.RecordsCount, '/records')
 api.add_resource(resources.FlatsCount, '/flats')
+api.add_resource(resources.ReturnTop, '/top')
+api.add_resource(resources.ReturnIntervals, '/intervals')
 
 
 

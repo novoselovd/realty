@@ -213,10 +213,13 @@ class ReturnData(Resource):
 class FilterData(Resource):
     @jwt_required
     def get(self):
-        coeff = request.args.get('coeff')
-        square = request.args.get('square')
-        price = request.args.get('price')
-        results = TempModel.filter(square, coeff, price)
+        coeffMin = request.args.get('coeffMin')
+        coeffMax = request.args.get('coeffMax')
+        squareMin = request.args.get('squareMin')
+        squareMax = request.args.get('squareMax')
+        priceMin = request.args.get('priceMin')
+        priceMax = request.args.get('priceMax')
+        results = TempModel.filter(squareMin, squareMax, coeffMin, coeffMax, priceMin, priceMax)
 
         return [r.as_dict() for r in results], 200
 
@@ -312,3 +315,26 @@ class FlatsCount(Resource):
     def get(self):
         count = TempModel.count()
         return {'Total flats': count}, 200
+
+
+class ReturnTop(Resource):
+    @jwt_required
+    def get(self):
+        results = TempModel.top()
+        return [r.as_dict() for r in results], 200
+
+
+class ReturnIntervals(Resource):
+    @jwt_required
+    def get(self):
+        results = TempModel.get_intervals()
+        return {'coeffMin': results[0], 'coeffMax': results[1], 'squareMin': results[2], 'squareMax': results[3],
+                'priceMin': results[4], 'priceMax': results[5]}, 200
+
+
+class ReturnIntervals(Resource):
+    @jwt_required
+    def get(self):
+        results = TempModel.get_intervals()
+        return {'coeffMin': results[0], 'coeffMax': results[1], 'squareMin': results[2], 'squareMax': results[3],
+                'priceMin': results[4], 'priceMax': results[5]}, 200
