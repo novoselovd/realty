@@ -119,6 +119,10 @@ api.add_resource(resources.RecordsCount, '/records')
 api.add_resource(resources.FlatsCount, '/flats')
 api.add_resource(resources.ReturnTop, '/top')
 api.add_resource(resources.ReturnIntervals, '/intervals')
+api.add_resource(resources.AddFav, '/add_favourite')
+api.add_resource(resources.RemoveFav, '/remove_favourite')
+api.add_resource(resources.EmptyFav, '/empty_favourites')
+api.add_resource(resources.ReturnFav, '/favourites')
 
 
 

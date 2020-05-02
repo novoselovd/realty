@@ -8,24 +8,39 @@ from sqlalchemy import and_, or_, not_
 from sqlalchemy import func
 from sqlalchemy.ext.mutable import Mutable
 from sqlalchemy.dialects.postgresql import ARRAY
+# from sqlalchemy.dialects import postgresql
 import datetime
 import json
 from threading import Thread
 
 
-# class MutableList(Mutable, list):
-#     def append(self, value):
-#         list.append(self, value)
-#         self.changed()
-#
-#     @classmethod
-#     def coerce(cls, key, value):
-#         if not isinstance(value, MutableList):
-#             if isinstance(value, list):
-#                 return MutableList(value)
-#             return Mutable.coerce(key, value)
-#         else:
-#             return value
+class MutableList(Mutable, list):
+
+    def __setitem__(self, key, value):
+        list.__setitem__(self, key, value)
+        self.changed()
+
+    def __delitem__(self, key):
+        list.__delitem__(self, key)
+        self.changed()
+
+    def append(self, value):
+        list.append(self, value)
+        self.changed()
+
+    def pop(self, index=0):
+        value = list.pop(self, index)
+        self.changed()
+        return value
+
+    @classmethod
+    def coerce(cls, key, value):
+        if not isinstance(value, MutableList):
+            if isinstance(value, list):
+                return MutableList(value)
+            return Mutable.coerce(key, value)
+        else:
+            return value
 
 
 def async_send_mail(app, msg):
@@ -43,8 +58,9 @@ class UserModel(db.Model):
 
     id = db.Column(db.Integer, primary_key = True)
     username = db.Column(db.String(120), unique = True, nullable = False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique = True, nullable=False)
     password = db.Column(db.String(120), nullable = False)
+    favourites = db.Column(MutableList.as_mutable(ARRAY(db.BigInteger)), server_default="{}", unique = True)
     
     def save_to_db(self):
         db.session.add(self)
@@ -97,6 +113,7 @@ class UserModel(db.Model):
     @staticmethod
     def generate_hash(password):
         return sha256.hash(password)
+
     
     @staticmethod
     def verify_hash(password, hash):
@@ -147,6 +164,41 @@ class UserModel(db.Model):
         msg.html = name + ' ' + email + ' ' + message
 
         mail.send(msg)
+
+
+    def add_fav(self, sell_id, rent_id):
+
+        self.favourites.append([sell_id, rent_id])
+
+        # db.session.query(UserModel).filter(UserModel.username == self.username).\
+        #     update({UserModel.favourites: UserModel.favourites.append([sell_id, rent_id])},
+        #            synchronize_session=False)
+        db.session.commit()
+
+
+
+    def remove_fav(self, sell_id, rent_id):
+        # self.favourites.pop([sell_id, rent_id])
+        favourites = self.favourites
+
+        ind = favourites.index([sell_id, rent_id])
+
+        self.favourites.pop(ind)
+        # print(ind)
+
+        db.session.commit()
+
+    def empty_fav(self):
+        db.session.query(UserModel).filter(UserModel.username == self.username).\
+            update({UserModel.favourites: {}},
+                   synchronize_session=False)
+
+        db.session.commit()
+
+
+    def get_fav(self):
+        data = self.favourites
+        return data
 
 
 class RevokedTokenModel(db.Model):
@@ -231,7 +283,6 @@ class RealtyModel(db.Model, JsonModel):
     @staticmethod
     def find_addresses():
         result = 0
-        # latlon = {}
         sell = db.session.query(RealtyModel).filter(RealtyModel.type == 1).all()
         rent = db.session.query(RealtyModel).filter(RealtyModel.type == 2).all()
 
@@ -241,14 +292,11 @@ class RealtyModel(db.Model, JsonModel):
             for q in rent:
                 if r.latitude == q.latitude and r.longitude == q.longitude and abs(r.area-q.area) < 5.0:
                     if tuple([r.latitude, r.longitude]) not in res:
-                        # latlon[tuple([r.latitude, r.longitude])] = int(r.price / (12.0 * q.price))
                         res[tuple([r.latitude, r.longitude])] = [r, q, int(r.price / (12.0 * q.price))]
                         result += 1
                     else:
                         if res[tuple([r.latitude, r.longitude])][2] > int(r.price / (12.0 * q.price)):
-                            # latlon.pop(tuple([r.latitude, r.longitude]), None)
                             res.pop(tuple([r.latitude, r.longitude]), None)
-                            # latlon[tuple([r.latitude, r.longitude])] = int(r.price / (12.0 * q.price))
                             res[tuple([r.latitude, r.longitude])] = [r, q, int(r.price / (12.0 * q.price))]
 
         return res

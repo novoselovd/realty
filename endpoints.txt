@@ -25,3 +25,7 @@
 18) FlatsCount. URL: /flats. Usage: Метод GET. Возвращает кол-во жк с окупаемостью.
 19) ReturnTop. URL: /top. Usage: Требуется access_token, метод GET. Возвращает 10 самых быстроокупаемых жк.
 20) ReturnIntervals. URL: /intervals. Usage: Требуется access_token, метод GET. Возвращает интервалы значений фильтров.
+21) AddFav. URL: /add_favourite. Usage: Требуется access_token, метод POST с параметрами sell и rent (айдишники объявлений). Добавляет пару в избранное.
+22) RemoveFav. URL: /remove_favourite. Usage: Требуется access_token, метод POST с параметрами sell и rent (айдишники объявлений). Удаляет пару из избранного.
+23) EmptyFav. URL: /empty_favourites. Usage: Требуется access_token, метод POST. Удаляет все объекты из избранного.
+24) ReturnFav. URL: /favourites. Usage: Требуется access_token, метод GET. Возвращает список избранных объектов.

@@ -193,11 +193,11 @@ realty_parser.add_argument(
 
 
 class UpdateDatabase(Resource):
-    # @jwt_required
+    @jwt_required
     def get(self):
-        # user_dict = get_jwt_identity()
-        # if user_dict['username'] != 'dmitry':
-        #     return {'message': 'No access'}, 403
+        user_dict = get_jwt_identity()
+        if user_dict['username'] != 'dmitry':
+            return {'message': 'No access'}, 403
 
         data = realty_parser.parse_args()
         update_db(data['price'], data['deal_id'])
@@ -332,9 +332,55 @@ class ReturnIntervals(Resource):
                 'priceMin': results[4], 'priceMax': results[5]}, 200
 
 
-class ReturnIntervals(Resource):
+
+fav_parser = reqparse.RequestParser()
+fav_parser.add_argument('sell', help='Please add sell id', type=int, required=True, nullable=False)
+fav_parser.add_argument('rent', help='Please rent id', type=int, required=True, nullable=False)
+
+
+class AddFav(Resource):
+    @jwt_required
+    def post(self):
+        sell = int(fav_parser.parse_args()['sell'])
+        rent = int(fav_parser.parse_args()['rent'])
+
+        current_user = UserModel.find_by_username(get_jwt_identity()['username'])
+
+        if [sell, rent] in current_user.get_fav():
+            return {'message': 'This item is already in list'}, 400
+
+        current_user.add_fav(sell, rent)
+
+        return {'message': 'Successfully added item to favourites list!'}, 200
+
+
+class RemoveFav(Resource):
+    @jwt_required
+    def post(self):
+        sell = int(fav_parser.parse_args()['sell'])
+        rent = int(fav_parser.parse_args()['rent'])
+
+        current_user = UserModel.find_by_username(get_jwt_identity()['username'])
+
+        current_user.remove_fav(sell, rent)
+
+        return {'message': 'Successfully removed item from favourites list!'}, 200
+
+
+class EmptyFav(Resource):
+    @jwt_required
+    def post(self):
+        current_user = UserModel.find_by_username(get_jwt_identity()['username'])
+        current_user.empty_fav()
+
+        return {'message': 'Successfully removed everything from favourites!'}, 200
+
+
+class ReturnFav(Resource):
     @jwt_required
     def get(self):
-        results = TempModel.get_intervals()
-        return {'coeffMin': results[0], 'coeffMax': results[1], 'squareMin': results[2], 'squareMax': results[3],
-                'priceMin': results[4], 'priceMax': results[5]}, 200
+        current_user = UserModel.find_by_username(get_jwt_identity()['username'])
+
+        data = current_user.get_fav()
+
+        return {'favourites': data}, 200
