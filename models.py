@@ -97,6 +97,7 @@ class UserModel(db.Model):
                 'username': x.username,
                 'id': x.id,
                 'email': x.email,
+                'favourites': x.favourites,
             }
 
         return {'user': to_json(cls.find_by_id(id))}

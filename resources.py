@@ -384,3 +384,11 @@ class ReturnFav(Resource):
         data = current_user.get_fav()
 
         return {'favourites': data}, 200
+
+
+class UserFindById(Resource):
+    @jwt_required
+    def get(self, id):
+        if int(get_jwt_identity()['id']) != int(id):
+            return {'message': 'Access denied'}, 400
+        return UserModel.return_user_by_id(id)
