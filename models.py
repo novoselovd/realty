@@ -60,7 +60,7 @@ class UserModel(db.Model):
     username = db.Column(db.String(120), unique = True, nullable = False)
     email = db.Column(db.String(120), unique = True, nullable=False)
     password = db.Column(db.String(120), nullable = False)
-    favourites = db.Column(MutableList.as_mutable(ARRAY(db.BigInteger)), server_default="{}", unique = True)
+    favourites = db.Column(MutableList.as_mutable(ARRAY(db.BigInteger)), server_default="{}")
     
     def save_to_db(self):
         db.session.add(self)
