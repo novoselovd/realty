@@ -380,10 +380,14 @@ class ReturnFav(Resource):
     @jwt_required
     def get(self):
         current_user = UserModel.find_by_username(get_jwt_identity()['username'])
+        results = []
 
         data = current_user.get_fav()
 
-        return {'favourites': data}, 200
+        for i in data:
+            results.append([RealtyModel.return_realty_by_id(i[0]), RealtyModel.return_realty_by_id(i[1])])
+
+        return {'favourites': results}, 200
 
 
 class UserFindById(Resource):
