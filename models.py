@@ -374,3 +374,26 @@ class TempModel(db.Model, JsonModel):
         return [coeffMin, coeffMax, squareMin, squareMax, priceMin, priceMax]
 
 
+class DistrictModel(db.Model, JsonModel):
+    __tablename__ = 'districts'
+    id = db.Column(db.Integer, primary_key=True)
+    okato_ao = db.Column(db.BigInteger)
+    name = db.Column(db.String(120))
+    type = db.Column(db.String(120))
+    avg_sq = db.Column(db.Float)
+    avg_coeff = db.Column(db.Integer)
+    coordinates = db.Column(MutableList.as_mutable(ARRAY(db.Float)), server_default="{}")
+
+    def save_to_db(self):
+        db.session.add(self)
+        db.session.commit()
+
+    @classmethod
+    def delete(cls, id):
+        deleted = cls.query.filter_by(id=id).delete()
+        db.session.commit()
+
+    @classmethod
+    def find_by_id(cls, id):
+        return cls.query.filter_by(id=id).first()
+

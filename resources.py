@@ -3,6 +3,7 @@ from flask import request, jsonify
 from models import UserModel, RevokedTokenModel, RealtyModel, TempModel
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
 from parser import update_db
+from polygons import parse_polygons, check_point_is_in_polygon
 import json
 
 
@@ -396,3 +397,17 @@ class UserFindById(Resource):
         if int(get_jwt_identity()['id']) != int(id):
             return {'message': 'Access denied'}, 400
         return UserModel.return_user_by_id(id)
+
+
+class ParsePolygons(Resource):
+    # @jwt_required
+    def get(self):
+        # user_dict = get_jwt_identity()
+        # if user_dict['username'] != 'dmitry':
+        #     return {'message': 'No access'}, 403
+
+        # parse_polygons()
+        
+        check_point_is_in_polygon()
+
+        return {'message': 'Successfully parsed polygons'}, 200

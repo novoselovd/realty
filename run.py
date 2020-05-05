@@ -124,6 +124,7 @@ api.add_resource(resources.RemoveFav, '/remove_favourite')
 api.add_resource(resources.EmptyFav, '/empty_favourites')
 api.add_resource(resources.ReturnFav, '/favourites')
 api.add_resource(resources.UserFindById, '/user/<id>')
+api.add_resource(resources.ParsePolygons, '/polygons')
 
 
 
