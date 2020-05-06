@@ -30,4 +30,5 @@
 23) EmptyFav. URL: /empty_favourites. Usage: Требуется access_token, метод POST. Удаляет все объекты из избранного.
 24) ReturnFav. URL: /favourites. Usage: Требуется access_token, метод GET. Возвращает список избранных объектов.
 25) UserFindById. URL: /user/<id>. Usage: Требуется access_token, метод GET. Ищется пользователь по заданному в адресе id.
+26) ReturnDistricts. URL: /districts. Usage: Требуется access_token, метод GET. Возвращает данные по муниципальным округам.
 

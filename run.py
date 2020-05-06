@@ -125,6 +125,7 @@ api.add_resource(resources.EmptyFav, '/empty_favourites')
 api.add_resource(resources.ReturnFav, '/favourites')
 api.add_resource(resources.UserFindById, '/user/<id>')
 api.add_resource(resources.ParsePolygons, '/polygons')
+api.add_resource(resources.ReturnDistricts, '/districts')
 
 
 

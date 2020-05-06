@@ -1,9 +1,9 @@
 from flask_restful import Resource, reqparse
 from flask import request, jsonify
-from models import UserModel, RevokedTokenModel, RealtyModel, TempModel
+from models import UserModel, RevokedTokenModel, RealtyModel, TempModel, DistrictModel
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
 from parser import update_db
-from polygons import parse_polygons, check_point_is_in_polygon
+from polygons import parse_polygons, check_point_is_in_polygon, count_avg_sq, count_avg_coeff
 import json
 
 
@@ -407,7 +407,17 @@ class ParsePolygons(Resource):
         #     return {'message': 'No access'}, 403
 
         # parse_polygons()
-        
-        check_point_is_in_polygon()
 
-        return {'message': 'Successfully parsed polygons'}, 200
+        # check_point_is_in_polygon()
+
+        # count_avg_sq()
+
+        count_avg_coeff()
+
+        return {'message': 'Successfully updated districts'}, 200
+
+
+class ReturnDistricts(Resource):
+    @jwt_required
+    def get(self):
+        return DistrictModel.return_all()

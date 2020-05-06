@@ -4,7 +4,7 @@ from time import time
 import jwt
 from flask_mail import Message
 from flask import render_template, url_for, Response
-from sqlalchemy import and_, or_, not_
+from sqlalchemy import and_, or_, not_, ForeignKey
 from sqlalchemy import func
 from sqlalchemy.ext.mutable import Mutable
 from sqlalchemy.dialects.postgresql import ARRAY
@@ -235,6 +235,7 @@ class RealtyModel(db.Model, JsonModel):
     city = db.Column(db.String(120))
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
+    dist = db.Column(db.Integer, ForeignKey('districts.id'))
     
     def save_to_db(self):
         db.session.add(self)
@@ -302,6 +303,11 @@ class RealtyModel(db.Model, JsonModel):
 
         return res
 
+    @staticmethod
+    def update_dist():
+        # self.dist = dist_id
+        db.session.commit()
+
 
 class TempModel(db.Model, JsonModel):
     __tablename__ = 'temp'
@@ -315,6 +321,7 @@ class TempModel(db.Model, JsonModel):
     area = db.Column(db.Float)
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
+    dist = db.Column(db.Integer, ForeignKey('districts.id'))
 
     def save_to_db(self):
         db.session.add(self)
@@ -396,4 +403,20 @@ class DistrictModel(db.Model, JsonModel):
     @classmethod
     def find_by_id(cls, id):
         return cls.query.filter_by(id=id).first()
+
+
+    @classmethod
+    def return_all(cls):
+        def to_json(x):
+            return {
+                'id': x.id,
+                'okato_ao': x.okato_ao,
+                'name': x.name,
+                'type': x.type,
+                'avg_sq': x.avg_sq,
+                'avg_coeff': x.avg_coeff,
+                'coordinates': x.coordinates
+            }
+
+        return {'districts': list(map(lambda x: to_json(x), DistrictModel.query.all()))}
 

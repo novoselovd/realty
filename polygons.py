@@ -1,6 +1,6 @@
 import json
 import numpy as np
-from models import DistrictModel, RealtyModel
+from models import DistrictModel, RealtyModel, TempModel
 from numba import jit
 
 def parse_polygons():
@@ -54,12 +54,58 @@ def check_point_is_in_polygon():
             if d.type == "Polygon":
                 if ray_tracing(f.longitude, f.latitude, np.array(d.coordinates)):
                     res+=1
+                    # f.dist = d.id
                     continue
             elif d.type == "MultiPolygon":
                 for p in d.coordinates:
                     if ray_tracing(f.longitude, f.latitude, np.array(p)):
                         res += 1
+                        # f.dist = d.id
                         continue
+        print(res)
+
+    RealtyModel.update_dist()
+
+def count_avg_sq():
+    districts = DistrictModel.query.all()
+    flats = RealtyModel.query.all()
+
+    for d in districts:
+        sum = 0.0
+        count = 0
+        for f in flats:
+            if f.type == 1:
+                if d.id == f.dist:
+                    sum += f.price/f.area
+                    count += 1
+
+        if count > 0:
+            d.avg_sq = sum/count
+
+    RealtyModel.update_dist()
 
 
+def count_avg_coeff():
+    districts = DistrictModel.query.all()
+    flats = RealtyModel.query.all()
+    flats_with_coeffs = TempModel.query.all()
 
+    for fwc in flats_with_coeffs:
+        for f in flats:
+            if fwc.id == f.id:
+                fwc.dist = f.dist
+
+    RealtyModel.update_dist()
+
+    for d in districts:
+        coeff = 0
+        count = 0
+        for fwc in flats_with_coeffs:
+            if d.id == fwc.dist:
+                coeff += fwc.coeff
+                count += 1
+
+        if count > 0:
+            d.avg_coeff = int(coeff/count)
+
+    RealtyModel.update_dist()
