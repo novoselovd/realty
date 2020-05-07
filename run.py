@@ -126,6 +126,8 @@ api.add_resource(resources.ReturnFav, '/favourites')
 api.add_resource(resources.UserFindById, '/user/<id>')
 api.add_resource(resources.ParsePolygons, '/polygons')
 api.add_resource(resources.ReturnDistricts, '/districts')
+api.add_resource(resources.ReturnAo, '/ao')
+api.add_resource(resources.ReturnAoCoords, '/ao_coords')
 
 
 

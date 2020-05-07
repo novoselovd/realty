@@ -31,4 +31,6 @@
 24) ReturnFav. URL: /favourites. Usage: Требуется access_token, метод GET. Возвращает список избранных объектов.
 25) UserFindById. URL: /user/<id>. Usage: Требуется access_token, метод GET. Ищется пользователь по заданному в адресе id.
 26) ReturnDistricts. URL: /districts. Usage: Требуется access_token, метод GET. Возвращает данные по муниципальным округам.
+27) ReturnAo. URL: /ao. Usage: Требуется access_token, метод GET. Возвращает данные по административным округам.
+28) ReturnAoCoords. URL: /ao_coords. Usage: Метод GET. Возвращает координаты административных округов.
 

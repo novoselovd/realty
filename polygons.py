@@ -1,7 +1,8 @@
 import json
 import numpy as np
-from models import DistrictModel, RealtyModel, TempModel
+from models import DistrictModel, RealtyModel, TempModel, AoModel
 from numba import jit
+import numpy as np
 
 def parse_polygons():
     # read file
@@ -54,15 +55,15 @@ def check_point_is_in_polygon():
             if d.type == "Polygon":
                 if ray_tracing(f.longitude, f.latitude, np.array(d.coordinates)):
                     res+=1
-                    # f.dist = d.id
+                    f.dist = d.id
                     continue
             elif d.type == "MultiPolygon":
                 for p in d.coordinates:
                     if ray_tracing(f.longitude, f.latitude, np.array(p)):
                         res += 1
-                        # f.dist = d.id
+                        f.dist = d.id
                         continue
-        print(res)
+        # print(res)
 
     RealtyModel.update_dist()
 
@@ -109,3 +110,49 @@ def count_avg_coeff():
             d.avg_coeff = int(coeff/count)
 
     RealtyModel.update_dist()
+
+
+def parse_ao():
+    # with open('ao.json', 'r') as myfile:
+    #     data=myfile.read()
+    #
+    # obj = json.loads(data)
+    #
+    # for i in obj['features']:
+    #     new_ao = AoModel(
+    #         id=i['properties']['OKATO'],
+    #         name=i['properties']['NAME'],
+    #         type=i['geometry']['type']
+    #     )
+    #
+    #     new_ao.save_to_db()
+    #
+    districts = DistrictModel.query.all()
+    ao = AoModel.query.all()
+
+    for a in ao:
+        sumsq = 0.0
+        sumcoeff = 0
+        countsq = 0
+        countcoeff = 0
+        for d in districts:
+            if a.id == d.okato_ao:
+                if d.avg_sq:
+                    sumsq += d.avg_sq
+                    countsq += 1
+                if d.avg_coeff:
+                    sumcoeff += d.avg_coeff
+                    countcoeff += 1
+
+        if countsq != 0:
+            a.avg_sq = sumsq/countsq
+
+        if countcoeff != 0:
+            a.avg_coeff = int(sumcoeff/countcoeff)
+
+
+    RealtyModel.update_dist()
+
+
+
+

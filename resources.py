@@ -1,9 +1,9 @@
 from flask_restful import Resource, reqparse
 from flask import request, jsonify
-from models import UserModel, RevokedTokenModel, RealtyModel, TempModel, DistrictModel
+from models import UserModel, RevokedTokenModel, RealtyModel, TempModel, DistrictModel, AoModel
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
 from parser import update_db
-from polygons import parse_polygons, check_point_is_in_polygon, count_avg_sq, count_avg_coeff
+from polygons import parse_polygons, check_point_is_in_polygon, count_avg_sq, count_avg_coeff, parse_ao
 import json
 
 
@@ -405,14 +405,16 @@ class ParsePolygons(Resource):
         # user_dict = get_jwt_identity()
         # if user_dict['username'] != 'dmitry':
         #     return {'message': 'No access'}, 403
-
+        #
         # parse_polygons()
-
+        #
         # check_point_is_in_polygon()
-
+        #
         # count_avg_sq()
+        #
+        # count_avg_coeff()
 
-        count_avg_coeff()
+        parse_ao()
 
         return {'message': 'Successfully updated districts'}, 200
 
@@ -421,3 +423,19 @@ class ReturnDistricts(Resource):
     @jwt_required
     def get(self):
         return DistrictModel.return_all()
+
+
+class ReturnAo(Resource):
+    @jwt_required
+    def get(self):
+        return AoModel.return_all()
+
+
+class ReturnAoCoords(Resource):
+    # @jwt_required
+    def get(self):
+        with open('ao.json', 'r') as myfile:
+            data = myfile.read()
+
+        obj = json.loads(data)
+        return obj

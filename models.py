@@ -420,3 +420,42 @@ class DistrictModel(db.Model, JsonModel):
 
         return {'districts': list(map(lambda x: to_json(x), DistrictModel.query.all()))}
 
+
+class AoModel(db.Model, JsonModel):
+    __tablename__ = 'ao'
+    id = db.Column(db.BigInteger, primary_key=True)
+    name = db.Column(db.String(120))
+    type = db.Column(db.String(120))
+    avg_sq = db.Column(db.Float)
+    avg_coeff = db.Column(db.Integer)
+    # coordinates = db.Column(MutableList.as_mutable(ARRAY(db.Float)), server_default="{}")
+
+    def save_to_db(self):
+        db.session.add(self)
+        db.session.commit()
+
+    @classmethod
+    def delete(cls, id):
+        deleted = cls.query.filter_by(id=id).delete()
+        db.session.commit()
+
+    @classmethod
+    def find_by_id(cls, id):
+        return cls.query.filter_by(id=id).first()
+
+
+    @classmethod
+    def return_all(cls):
+        def to_json(x):
+            return {
+                'id': x.id,
+                'name': x.name,
+                'type': x.type,
+                'avg_sq': x.avg_sq,
+                'avg_coeff': x.avg_coeff,
+                # 'coordinates': x.coordinates
+            }
+
+        return {'ao': list(map(lambda x: to_json(x), AoModel.query.all()))}
+
+
