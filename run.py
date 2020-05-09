@@ -128,6 +128,7 @@ api.add_resource(resources.ParsePolygons, '/polygons')
 api.add_resource(resources.ReturnDistricts, '/districts')
 api.add_resource(resources.ReturnAo, '/ao')
 api.add_resource(resources.ReturnAoCoords, '/ao_coords')
+api.add_resource(resources.FindLatLon, '/latlon')
 
 
 

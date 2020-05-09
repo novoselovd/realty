@@ -33,4 +33,5 @@
 26) ReturnDistricts. URL: /districts. Usage: Требуется access_token, метод GET. Возвращает данные по муниципальным округам.
 27) ReturnAo. URL: /ao. Usage: Требуется access_token, метод GET. Возвращает данные по административным округам.
 28) ReturnAoCoords. URL: /ao_coords. Usage: Метод GET. Возвращает координаты административных округов.
+29) FindLatLon. URL: /latlon. Usage: Метод GET с полем address. Возвращает координаты адреса.
 

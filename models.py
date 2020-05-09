@@ -50,22 +50,21 @@ def async_send_mail(app, msg):
 
 class JsonModel(object):
     def as_dict(self):
-       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 
 class UserModel(db.Model):
     __tablename__ = 'users'
 
-    id = db.Column(db.Integer, primary_key = True)
-    username = db.Column(db.String(120), unique = True, nullable = False)
-    email = db.Column(db.String(120), unique = True, nullable=False)
-    password = db.Column(db.String(120), nullable = False)
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(120), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(120), nullable=False)
     favourites = db.Column(MutableList.as_mutable(ARRAY(db.BigInteger)), server_default="{}")
-    
+
     def save_to_db(self):
         db.session.add(self)
         db.session.commit()
-    
 
     @classmethod
     def find_by_username(cls, username):
@@ -115,13 +114,12 @@ class UserModel(db.Model):
     def generate_hash(password):
         return sha256.hash(password)
 
-    
     @staticmethod
     def verify_hash(password, hash):
         return sha256.verify(password, hash)
 
     def change_password(self, new_password):
-        db.session.query(UserModel).filter(UserModel.username == self.username).\
+        db.session.query(UserModel).filter(UserModel.username == self.username). \
             update({UserModel.password: new_password},
                    synchronize_session=False)
         db.session.commit()
@@ -145,7 +143,7 @@ class UserModel(db.Model):
         msg = Message('Reset your password',
                       sender='realtyanalyzer@yandex.ru', recipients=[user.email])
         link = 'https://real-estate-research-6f694.firebaseapp.com/auth/restore-password?token=' + \
-            str(token)[2:-1]
+               str(token)[2:-1]
         msg.body = render_template('reset_password.txt',
                                    user=user, link=link)
         msg.html = render_template('reset_password.html',
@@ -156,7 +154,6 @@ class UserModel(db.Model):
 
         mail.send(msg)
 
-
     @staticmethod
     def send_feedback(name, email, subject, message):
         msg = Message(subject,
@@ -166,7 +163,6 @@ class UserModel(db.Model):
 
         mail.send(msg)
 
-
     def add_fav(self, sell_id, rent_id):
 
         self.favourites.append([sell_id, rent_id])
@@ -175,8 +171,6 @@ class UserModel(db.Model):
         #     update({UserModel.favourites: UserModel.favourites.append([sell_id, rent_id])},
         #            synchronize_session=False)
         db.session.commit()
-
-
 
     def remove_fav(self, sell_id, rent_id):
         # self.favourites.pop([sell_id, rent_id])
@@ -190,12 +184,11 @@ class UserModel(db.Model):
         db.session.commit()
 
     def empty_fav(self):
-        db.session.query(UserModel).filter(UserModel.username == self.username).\
+        db.session.query(UserModel).filter(UserModel.username == self.username). \
             update({UserModel.favourites: {}},
                    synchronize_session=False)
 
         db.session.commit()
-
 
     def get_fav(self):
         data = self.favourites
@@ -204,16 +197,16 @@ class UserModel(db.Model):
 
 class RevokedTokenModel(db.Model):
     __tablename__ = 'revoked_tokens'
-    id = db.Column(db.Integer, primary_key = True)
+    id = db.Column(db.Integer, primary_key=True)
     jti = db.Column(db.String(120))
-    
+
     def add(self):
         db.session.add(self)
         db.session.commit()
-    
+
     @classmethod
     def is_jti_blacklisted(cls, jti):
-        query = cls.query.filter_by(jti = jti).first()
+        query = cls.query.filter_by(jti=jti).first()
         return bool(query)
 
 
@@ -221,22 +214,26 @@ class RealtyModel(db.Model, JsonModel):
     __tablename__ = 'realty'
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.Integer)
-    url = db.Column(db.String(120))
+    url = db.Column(db.Text)
     price = db.Column(db.Float)
-    phone = db.Column(db.String(120))
-    address = db.Column(db.String(120))
-    metro = db.Column(db.String(120))
+    phone = db.Column(db.Text)
+    address = db.Column(db.Text)
+    metro = db.Column(db.Text)
     area = db.Column(db.Float)
     rooms_count = db.Column(db.Integer)
     floor_number = db.Column(db.Integer)
     floors_count = db.Column(db.Integer)
     images = db.Column(db.Text)
     description = db.Column(db.Text)
-    city = db.Column(db.String(120))
+    city = db.Column(db.Text)
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
+    area_kitchen = db.Column(db.Float)
+    time_publish = db.Column(db.DateTime)
+    building_material_type = db.Column(db.Text)
+    status = db.Column(db.Integer)
     dist = db.Column(db.Integer, ForeignKey('districts.id'))
-    
+
     def save_to_db(self):
         db.session.add(self)
         db.session.commit()
@@ -276,11 +273,9 @@ class RealtyModel(db.Model, JsonModel):
     def return_realty_by_id(cls, id):
         return {'realty': cls.to_json(cls.find_by_id(id))}
 
-
     @staticmethod
     def count():
         return db.session.query(RealtyModel).count()
-
 
     @staticmethod
     def find_addresses():
@@ -292,7 +287,7 @@ class RealtyModel(db.Model, JsonModel):
 
         for r in sell:
             for q in rent:
-                if r.latitude == q.latitude and r.longitude == q.longitude and abs(r.area-q.area) < 5.0:
+                if r.latitude == q.latitude and r.longitude == q.longitude and abs(r.area - q.area) < 5.0:
                     if tuple([r.latitude, r.longitude]) not in res:
                         res[tuple([r.latitude, r.longitude])] = [r, q, int(r.price / (12.0 * q.price))]
                         result += 1
@@ -312,12 +307,12 @@ class RealtyModel(db.Model, JsonModel):
 class TempModel(db.Model, JsonModel):
     __tablename__ = 'temp'
     id = db.Column(db.Integer, primary_key=True)
-    sell_url = db.Column(db.String(120))
-    rent_url = db.Column(db.String(120))
+    sell_url = db.Column(db.Text)
+    rent_url = db.Column(db.Text)
     sell_price = db.Column(db.Float)
     rent_price = db.Column(db.Float)
     coeff = db.Column(db.Integer)
-    address = db.Column(db.String(120))
+    address = db.Column(db.Text)
     area = db.Column(db.Float)
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
@@ -340,12 +335,12 @@ class TempModel(db.Model, JsonModel):
     def find_by_latlon(cls, lat, lon):
         return cls.query.filter_by(latitude=lat, longitude=lon).first()
 
-
     @staticmethod
     def filter(squareMin, squareMax, coeffMin, coeffMax, priceMin, priceMax):
-        query = db.session.query(TempModel).filter(and_(TempModel.coeff >= float(coeffMin), TempModel.coeff <= float(coeffMax),
-                                                        TempModel.sell_price >= float(priceMin), TempModel.sell_price <= float(priceMax),
-                                                        TempModel.area >= float(squareMin), TempModel.area <= float(squareMax)))
+        query = db.session.query(TempModel).filter(
+            and_(TempModel.coeff >= float(coeffMin), TempModel.coeff <= float(coeffMax),
+                 TempModel.sell_price >= float(priceMin), TempModel.sell_price <= float(priceMax),
+                 TempModel.area >= float(squareMin), TempModel.area <= float(squareMax)))
         results = query.all()
         return results
 
@@ -359,7 +354,7 @@ class TempModel(db.Model, JsonModel):
         results = [r[0] for r in query.all()]
 
         # print(results)
-        return round(sum(results)/len(results))
+        return round(sum(results) / len(results))
 
     @staticmethod
     def top():
@@ -404,7 +399,6 @@ class DistrictModel(db.Model, JsonModel):
     def find_by_id(cls, id):
         return cls.query.filter_by(id=id).first()
 
-
     @classmethod
     def return_all(cls):
         def to_json(x):
@@ -428,6 +422,7 @@ class AoModel(db.Model, JsonModel):
     type = db.Column(db.String(120))
     avg_sq = db.Column(db.Float)
     avg_coeff = db.Column(db.Integer)
+
     # coordinates = db.Column(MutableList.as_mutable(ARRAY(db.Float)), server_default="{}")
 
     def save_to_db(self):
@@ -443,7 +438,6 @@ class AoModel(db.Model, JsonModel):
     def find_by_id(cls, id):
         return cls.query.filter_by(id=id).first()
 
-
     @classmethod
     def return_all(cls):
         def to_json(x):
@@ -457,5 +451,3 @@ class AoModel(db.Model, JsonModel):
             }
 
         return {'ao': list(map(lambda x: to_json(x), AoModel.query.all()))}
-
-

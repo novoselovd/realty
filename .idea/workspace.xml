@@ -2,13 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="94636672-f3ec-43a9-86d1-06d9a1e91ddb" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/ao.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/estimate.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/endpoints.txt" beforeDir="false" afterPath="$PROJECT_DIR$/endpoints.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/parser.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/polygons.py" beforeDir="false" afterPath="$PROJECT_DIR$/polygons.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources.py" beforeDir="false" afterPath="$PROJECT_DIR$/resources.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/run.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -19,23 +21,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="endpoints.txt" pinned="false" current-in-tab="true">
+      <file leaf-file-name="endpoints.txt" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/endpoints.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="510">
-              <caret line="34" column="101" selection-start-line="34" selection-start-column="101" selection-end-line="34" selection-end-column="101" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="polygons.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/polygons.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="300">
-              <caret line="138" column="34" selection-start-line="138" selection-start-column="34" selection-end-line="138" selection-end-column="34" />
-              <folding>
-                <element signature="e#0#11#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="525">
+              <caret line="35" column="92" selection-start-line="35" selection-start-column="92" selection-end-line="35" selection-end-column="92" />
             </state>
           </provider>
         </entry>
@@ -43,8 +33,8 @@
       <file leaf-file-name="run.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/run.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="491">
-              <caret line="129" column="41" selection-start-line="129" selection-start-column="27" selection-end-line="129" selection-end-column="41" />
+            <state relative-caret-position="548">
+              <caret line="130" column="37" selection-start-line="130" selection-start-column="27" selection-end-line="130" selection-end-column="37" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -55,8 +45,8 @@
       <file leaf-file-name="models.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-475">
-              <caret line="389" column="10" selection-start-line="389" selection-start-column="4" selection-end-line="389" selection-end-column="10" />
+            <state relative-caret-position="397">
+              <caret line="303" column="27" lean-forward="true" selection-start-line="303" selection-start-column="27" selection-end-line="303" selection-end-column="27" />
               <folding>
                 <element signature="e#0#29#0" expanded="true" />
               </folding>
@@ -64,14 +54,35 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="resources.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="resources.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/resources.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="406">
-              <caret line="428" selection-start-line="428" selection-end-line="428" selection-end-column="17" />
+            <state relative-caret-position="299">
+              <caret line="452" column="29" selection-start-line="452" selection-start-column="29" selection-end-line="452" selection-end-column="29" />
               <folding>
                 <element signature="e#0#44#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="polygons.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/polygons.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-1081">
+              <caret line="56" column="31" selection-start-line="56" selection-start-column="31" selection-end-line="56" selection-end-column="31" />
+              <folding>
+                <element signature="e#0#11#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="test.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="75">
+              <caret line="5" column="9" selection-start-line="5" selection-start-column="9" selection-end-line="5" selection-end-column="37" />
             </state>
           </provider>
         </entry>
@@ -96,15 +107,22 @@
       <find>Нагатинский Затон</find>
       <find>MultiPolygon</find>
       <find>parse</find>
-      <find>update_db</find>
       <find>45263000</find>
-      <find>update</find>
       <find>change_password</find>
       <find>Polygon</find>
       <find>]</find>
       <find>)</find>
+      <find>UpdateDatabase</find>
+      <find>CountSameAddresses</find>
+      <find>кунцев</find>
+      <find>}</find>
+      <find>update_db</find>
+      <find>coeff</find>
+      <find>update_dist</find>
+      <find>update</find>
     </findStrings>
     <replaceStrings>
+      <replace>]</replace>
       <replace>}</replace>
     </replaceStrings>
   </component>
@@ -114,14 +132,16 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/parser.py" />
         <option value="$PROJECT_DIR$/ao.json" />
         <option value="$PROJECT_DIR$/test" />
+        <option value="$PROJECT_DIR$/estimate.py" />
         <option value="$PROJECT_DIR$/models.py" />
-        <option value="$PROJECT_DIR$/run.py" />
+        <option value="$PROJECT_DIR$/parser.py" />
         <option value="$PROJECT_DIR$/polygons.py" />
-        <option value="$PROJECT_DIR$/resources.py" />
+        <option value="$PROJECT_DIR$/test.py" />
+        <option value="$PROJECT_DIR$/run.py" />
         <option value="$PROJECT_DIR$/endpoints.txt" />
+        <option value="$PROJECT_DIR$/resources.py" />
       </list>
     </option>
   </component>
@@ -327,32 +347,8 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/parser.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" column="13" selection-start-line="3" selection-start-column="4" selection-end-line="3" selection-end-column="13" />
-          <folding>
-            <element signature="e#0#27#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/ao.geojson">
       <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mo.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-23348">
-          <caret line="5" column="232" selection-start-line="5" selection-start-column="220" selection-end-line="5" selection-end-column="232" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="618">
-          <caret column="30728" selection-end-column="30820" />
-        </state>
-      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/ao.json">
       <provider selected="true" editor-type-id="text-editor">
@@ -361,50 +357,91 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/mo.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="194">
+          <caret line="149" column="378" selection-start-line="149" selection-start-column="359" selection-end-line="149" selection-end-column="378" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-204">
+          <caret column="889" lean-forward="true" selection-end-column="7390" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/estimate.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="584">
+          <caret line="80" selection-start-line="80" selection-end-line="80" />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/parser.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="52">
+          <caret line="5" column="182" selection-start-line="5" selection-start-column="182" selection-end-line="5" selection-end-column="182" />
+          <folding>
+            <element signature="e#0#27#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-475">
-          <caret line="389" column="10" selection-start-line="389" selection-start-column="4" selection-end-line="389" selection-end-column="10" />
+        <state relative-caret-position="397">
+          <caret line="303" column="27" lean-forward="true" selection-start-line="303" selection-start-column="27" selection-end-line="303" selection-end-column="27" />
           <folding>
             <element signature="e#0#29#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/resources.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="406">
-          <caret line="428" selection-start-line="428" selection-end-line="428" selection-end-column="17" />
-          <folding>
-            <element signature="e#0#44#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/polygons.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="138" column="34" selection-start-line="138" selection-start-column="34" selection-end-line="138" selection-end-column="34" />
+        <state relative-caret-position="-1081">
+          <caret line="56" column="31" selection-start-line="56" selection-start-column="31" selection-end-line="56" selection-end-column="31" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/endpoints.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="525">
+          <caret line="35" column="92" selection-start-line="35" selection-start-column="92" selection-end-line="35" selection-end-column="92" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/run.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="491">
-          <caret line="129" column="41" selection-start-line="129" selection-start-column="27" selection-end-line="129" selection-end-column="41" />
+        <state relative-caret-position="548">
+          <caret line="130" column="37" selection-start-line="130" selection-start-column="27" selection-end-line="130" selection-end-column="37" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/endpoints.txt">
+    <entry file="file://$PROJECT_DIR$/test.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="510">
-          <caret line="34" column="101" selection-start-line="34" selection-start-column="101" selection-end-line="34" selection-end-column="101" />
+        <state relative-caret-position="75">
+          <caret line="5" column="9" selection-start-line="5" selection-start-column="9" selection-end-line="5" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="299">
+          <caret line="452" column="29" selection-start-line="452" selection-start-column="29" selection-end-line="452" selection-end-column="29" />
+          <folding>
+            <element signature="e#0#44#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

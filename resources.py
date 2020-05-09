@@ -1,15 +1,16 @@
 from flask_restful import Resource, reqparse
 from flask import request, jsonify
 from models import UserModel, RevokedTokenModel, RealtyModel, TempModel, DistrictModel, AoModel
-from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
+from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required,
+                                get_jwt_identity, get_raw_jwt)
 from parser import update_db
 from polygons import parse_polygons, check_point_is_in_polygon, count_avg_sq, count_avg_coeff, parse_ao
 import json
-
+from opencage.geocoder import OpenCageGeocode
 
 parser = reqparse.RequestParser()
-parser.add_argument('username', help = 'This field cannot be blank', required = True)
-parser.add_argument('password', help = 'This field cannot be blank', required = True)
+parser.add_argument('username', help='This field cannot be blank', required=True)
+parser.add_argument('password', help='This field cannot be blank', required=True)
 parser.add_argument(
     'email', help='This field cannot be blank', required=True)
 
@@ -17,25 +18,25 @@ parser.add_argument(
 class UserRegistration(Resource):
     def post(self):
         data = parser.parse_args()
-        
+
         if UserModel.find_by_username(data['username']) or UserModel.find_by_email(data['email']):
             return {'message': "User with such username or email already exists"}, 400
-        
+
         new_user = UserModel(
-            username = data['username'],
-            email = data['email'],
-            password = UserModel.generate_hash(data['password'])
+            username=data['username'],
+            email=data['email'],
+            password=UserModel.generate_hash(data['password'])
         )
-        
+
         # try:
         new_user.save_to_db()
-        access_token = create_access_token(identity = new_user)
-        refresh_token = create_refresh_token(identity = new_user)
+        access_token = create_access_token(identity=new_user)
+        refresh_token = create_refresh_token(identity=new_user)
         return {
             'message': 'User {} was created'.format(data['username']),
             'access_token': access_token,
             'refresh_token': refresh_token
-            }
+        }
         # except:
         #     return {'message': 'Something went wrong'}, 500
 
@@ -45,6 +46,7 @@ login_parser.add_argument(
     'username', help='This field cannot be blank', required=True)
 login_parser.add_argument(
     'password', help='This field cannot be blank', required=True)
+
 
 class UserLogin(Resource):
     def post(self):
@@ -71,7 +73,7 @@ class UserLogoutAccess(Resource):
     def post(self):
         jti = get_raw_jwt()['jti']
         try:
-            revoked_token = RevokedTokenModel(jti = jti)
+            revoked_token = RevokedTokenModel(jti=jti)
             revoked_token.add()
             return {'message': 'Access token has been revoked'}
         except:
@@ -102,9 +104,9 @@ class TokenRefresh(Resource):
             access_token = create_access_token(identity=current_user)
             refresh_token = create_refresh_token(identity=current_user)
             return {
-                'access_token': access_token,
-                'refresh_token': refresh_token
-            }, 200
+                       'access_token': access_token,
+                       'refresh_token': refresh_token
+                   }, 200
         except:
             return {'message': 'Something went wrong'}, 500
 
@@ -112,7 +114,7 @@ class TokenRefresh(Resource):
 class AllUsers(Resource):
     def get(self):
         return UserModel.return_all()
-    
+
     def delete(self):
         return UserModel.delete_all()
 
@@ -151,7 +153,6 @@ class UserChangePassword(Resource):
             return {'message': 'Wrong password'}, 400
 
 
-
 password_recover_parser = reqparse.RequestParser()
 password_recover_parser.add_argument(
     'email', help='Please fill in your email address', required=True)
@@ -165,7 +166,8 @@ class UserForgotPassword(Resource):
         if not current_user:
             return {'message': 'User with such email doesn\'t exist'}, 400
         UserModel.send_password_reset_email(current_user)
-        return {'message': "An e-mail was sent to {}. Follow the instructions to reset the password".format(data['email'])}
+        return {
+            'message': "An e-mail was sent to {}. Follow the instructions to reset the password".format(data['email'])}
 
 
 after_confirmation_password_change_parser = reqparse.RequestParser()
@@ -183,7 +185,8 @@ class UserResetPasswordViaEmail(Resource):
         access_token = create_access_token(identity=user)
         refresh_token = create_refresh_token(identity=user)
 
-        return {'message': 'You have successfully changed your password!', 'access_token': access_token, 'refresh_token': refresh_token}, 200
+        return {'message': 'You have successfully changed your password!', 'access_token': access_token,
+                'refresh_token': refresh_token}, 200
 
 
 realty_parser = reqparse.RequestParser()
@@ -194,11 +197,11 @@ realty_parser.add_argument(
 
 
 class UpdateDatabase(Resource):
-    @jwt_required
+    # @jwt_required
     def get(self):
-        user_dict = get_jwt_identity()
-        if user_dict['username'] != 'dmitry':
-            return {'message': 'No access'}, 403
+        # user_dict = get_jwt_identity()
+        # if user_dict['username'] != 'dmitry':
+        #     return {'message': 'No access'}, 403
 
         data = realty_parser.parse_args()
         update_db(data['price'], data['deal_id'])
@@ -223,6 +226,7 @@ class FilterData(Resource):
         results = TempModel.filter(squareMin, squareMax, coeffMin, coeffMax, priceMin, priceMax)
 
         return [r.as_dict() for r in results], 200
+
 
 class Autocomplete(Resource):
     @jwt_required
@@ -333,7 +337,6 @@ class ReturnIntervals(Resource):
                 'priceMin': results[4], 'priceMax': results[5]}, 200
 
 
-
 fav_parser = reqparse.RequestParser()
 fav_parser.add_argument('sell', help='Please add sell id', type=int, required=True, nullable=False)
 fav_parser.add_argument('rent', help='Please rent id', type=int, required=True, nullable=False)
@@ -408,11 +411,11 @@ class ParsePolygons(Resource):
         #
         # parse_polygons()
         #
-        # check_point_is_in_polygon()
-        #
-        # count_avg_sq()
-        #
-        # count_avg_coeff()
+        check_point_is_in_polygon()
+
+        count_avg_sq()
+
+        count_avg_coeff()
 
         parse_ao()
 
@@ -439,3 +442,31 @@ class ReturnAoCoords(Resource):
 
         obj = json.loads(data)
         return obj
+
+
+
+latlon_parser = reqparse.RequestParser()
+latlon_parser.add_argument('address', help='Please fill in address field', type=str, required=True, nullable=False)
+
+class FindLatLon(Resource):
+    def get(self):
+        query = latlon_parser.parse_args()['address']
+
+        key = 'a45c9a9a30e74fe2a9049689754b7774'
+        geocoder = OpenCageGeocode(key)
+
+        results = geocoder.geocode(query)
+
+        found = False
+
+        for i in results:
+            if i['components']['city'] == 'Moscow':
+                lat = i['geometry']['lat']
+                lon = i['geometry']['lng']
+                found = True
+                break
+
+        if not found:
+            return {'message': 'Could not find lat/lon'}, 400
+        else:
+            return {'coords': [lat, lon]}, 200
