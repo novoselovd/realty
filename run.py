@@ -129,6 +129,8 @@ api.add_resource(resources.ReturnDistricts, '/districts')
 api.add_resource(resources.ReturnAo, '/ao')
 api.add_resource(resources.ReturnAoCoords, '/ao_coords')
 api.add_resource(resources.FindLatLon, '/latlon')
+api.add_resource(resources.Estimate, '/estimate')
+api.add_resource(resources.GetTopDistricts, '/top_dist')
 
 
 

@@ -7,6 +7,12 @@ from parser import update_db
 from polygons import parse_polygons, check_point_is_in_polygon, count_avg_sq, count_avg_coeff, parse_ao
 import json
 from opencage.geocoder import OpenCageGeocode
+import pandas as pd
+import dill as pickle
+from geopy.distance import geodesic
+import numpy as np
+import math
+
 
 parser = reqparse.RequestParser()
 parser.add_argument('username', help='This field cannot be blank', required=True)
@@ -470,3 +476,95 @@ class FindLatLon(Resource):
             return {'message': 'Could not find lat/lon'}, 400
         else:
             return {'coords': [lat, lon]}, 200
+
+def get_azimuth(latitude, longitude):
+    rad = 6372795
+
+    llat1 = city_center_coordinates[0]
+    llong1 = city_center_coordinates[1]
+    llat2 = latitude
+    llong2 = longitude
+
+    lat1 = llat1 * math.pi / 180.
+    lat2 = llat2 * math.pi / 180.
+    long1 = llong1 * math.pi / 180.
+    long2 = llong2 * math.pi / 180.
+
+    cl1 = math.cos(lat1)
+    cl2 = math.cos(lat2)
+    sl1 = math.sin(lat1)
+    sl2 = math.sin(lat2)
+    delta = long2 - long1
+    cdelta = math.cos(delta)
+    sdelta = math.sin(delta)
+
+    y = math.sqrt(math.pow(cl2 * sdelta, 2) + math.pow(cl1 * sl2 - sl1 * cl2 * cdelta, 2))
+    x = sl1 * sl2 + cl1 * cl2 * cdelta
+    ad = math.atan2(y, x)
+
+    x = (cl1 * sl2) - (sl1 * cl2 * cdelta)
+    y = sdelta * cl2
+    z = math.degrees(math.atan(-y / x))
+
+    if (x < 0):
+        z = z + 180.
+
+    z2 = (z + 180.) % 360. - 180.
+    z2 = - math.radians(z2)
+    anglerad2 = z2 - ((2 * math.pi) * math.floor((z2 / (2 * math.pi))))
+    angledeg = (anglerad2 * 180.) / math.pi
+
+    return round(angledeg, 2)
+
+city_center_coordinates = [55.7522, 37.6156]
+
+
+
+estimate_parser = reqparse.RequestParser()
+estimate_parser.add_argument('wallsMaterial', help='Please fill in wallsMaterial', type=int, required=True, nullable=False)
+estimate_parser.add_argument('floorNumber', help='Please fill in floorNumber', type=int, required=True, nullable=False)
+estimate_parser.add_argument('floorsTotal', help='Please fill in floorsTotal', type=int, required=True, nullable=False)
+estimate_parser.add_argument('totalArea', help='Please fill in totalArea', type=float, required=True, nullable=False)
+estimate_parser.add_argument('kitchenArea', help='Please fill in kitchenArea', type=float, required=True, nullable=False)
+estimate_parser.add_argument('latitude', help='Please fill in latitude', type=float, required=True, nullable=False)
+estimate_parser.add_argument('longitude', help='Please fill in longitude', type=float, required=True, nullable=False)
+
+
+class Estimate(Resource):
+    def get(self):
+        query = estimate_parser.parse_args()
+
+        with open('xgb.pk', 'rb') as f:
+            loaded_model2 = pickle.load(f)
+
+        flat = pd.DataFrame({
+            'wallsMaterial': [query['wallsMaterial']],
+            'floorNumber': [query['floorNumber']],
+            'floorsTotal': [query['floorsTotal']],
+            'totalArea': [query['totalArea']],
+            'kitchenArea': [query['kitchenArea']],
+            'latitude': [query['latitude']],
+            'longitude': [query['longitude']]
+        })
+
+        flat['distance'] = list(
+            map(lambda x, y: geodesic(city_center_coordinates, [x, y]).meters, flat['latitude'], flat['longitude']))
+        flat['azimuth'] = list(map(lambda x, y: get_azimuth(x, y), flat['latitude'], flat['longitude']))
+        flat['distance'] = flat['distance'].round(0)
+        flat['azimuth'] = flat['azimuth'].round(0)
+
+        flat = flat.drop('latitude', axis=1)
+        flat = flat.drop('longitude', axis=1)
+
+        # rf_prediction_flat = loaded_model1.predict(flat).round(0)
+        xgb_prediction_flat = loaded_model2.predict(flat).round(0)
+
+        price = xgb_prediction_flat * flat['totalArea'][0]
+
+        return {'Predicted price': (int(price[0].round(-3)))}, 200
+
+
+class GetTopDistricts(Resource):
+    def get(self):
+        results = DistrictModel.top()
+        return [r.as_dict() for r in results], 200

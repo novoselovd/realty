@@ -399,6 +399,13 @@ class DistrictModel(db.Model, JsonModel):
     def find_by_id(cls, id):
         return cls.query.filter_by(id=id).first()
 
+    @staticmethod
+    def top():
+        query = db.session.query(DistrictModel).order_by(DistrictModel.avg_sq)
+
+        return query
+
+
     @classmethod
     def return_all(cls):
         def to_json(x):
