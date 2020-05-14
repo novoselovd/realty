@@ -9,6 +9,7 @@ from sqlalchemy import func
 from sqlalchemy.ext.mutable import Mutable
 from sqlalchemy.dialects.postgresql import ARRAY
 # from sqlalchemy.dialects import postgresql
+import geopy.distance
 import datetime
 import json
 from threading import Thread
@@ -232,6 +233,7 @@ class RealtyModel(db.Model, JsonModel):
     time_publish = db.Column(db.DateTime)
     building_material_type = db.Column(db.Text)
     status = db.Column(db.Integer)
+    predicted = db.Column(db.BigInteger)
     dist = db.Column(db.Integer, ForeignKey('districts.id'))
 
     def save_to_db(self):
@@ -269,6 +271,16 @@ class RealtyModel(db.Model, JsonModel):
             'longitude': x.longitude
         }
 
+    @staticmethod
+    def return_all():
+        def price_to_predicted(x):
+            return {
+                'id': x.id,
+                'price': x.price,
+                'predicted': x.predicted,
+            }
+        return {'Data': list(map(lambda x: price_to_predicted(x), RealtyModel.query.filter(and_(RealtyModel.predicted != None, RealtyModel.type == 1))))}
+
     @classmethod
     def return_realty_by_id(cls, id):
         return {'realty': cls.to_json(cls.find_by_id(id))}
@@ -302,6 +314,28 @@ class RealtyModel(db.Model, JsonModel):
     def update_dist():
         # self.dist = dist_id
         db.session.commit()
+
+
+    @staticmethod
+    def find_alt(lat, lon, area):
+        def form(x):
+            return {
+                'id': x.id,
+                'price': x.price,
+                'area': x.area,
+            }
+
+
+        ret = []
+        sell = db.session.query(RealtyModel).filter(RealtyModel.type == 1)
+        coords_1 = (lat, lon)
+
+        for i in sell:
+            coords_2 = (i.latitude, i.longitude)
+            if geopy.distance.vincenty(coords_1, coords_2).km < 1.5 and abs(area - i.area) < 5.0:
+                ret.append(form(i))
+
+        return ret
 
 
 class TempModel(db.Model, JsonModel):

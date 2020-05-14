@@ -47,7 +47,7 @@ def ray_tracing(x,y,poly):
 
 def check_point_is_in_polygon():
     districts = DistrictModel.query.all()
-    flats = RealtyModel.query.all()
+    flats = RealtyModel.query.filter(RealtyModel.dist == None)
     res = 0
 
     for d in districts:
@@ -61,12 +61,14 @@ def check_point_is_in_polygon():
             elif d.type == "MultiPolygon":
                 for p in d.coordinates:
                     if ray_tracing(f.longitude, f.latitude, np.array(p)):
+                        print('here')
                         res += 1
                         f.dist = d.id
                         continue
-        # print(res)
+
 
     RealtyModel.update_dist()
+    print(RealtyModel.query.filter(RealtyModel.dist == None).count())
 
 def count_avg_sq():
     districts = DistrictModel.query.all()

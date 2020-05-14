@@ -131,6 +131,11 @@ api.add_resource(resources.ReturnAoCoords, '/ao_coords')
 api.add_resource(resources.FindLatLon, '/latlon')
 api.add_resource(resources.Estimate, '/estimate')
 api.add_resource(resources.GetTopDistricts, '/top_dist')
+# api.add_resource(resources.MatchMl, '/match')
+api.add_resource(resources.CompareMlPrediction, '/mlcoeff')
+api.add_resource(resources.PriceToPredicted, '/compare')
+api.add_resource(resources.Alternatives, '/alternatives')
+
 
 
 

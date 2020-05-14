@@ -7,11 +7,13 @@ from parser import update_db
 from polygons import parse_polygons, check_point_is_in_polygon, count_avg_sq, count_avg_coeff, parse_ao
 import json
 from opencage.geocoder import OpenCageGeocode
+from sqlalchemy import and_
 import pandas as pd
 import dill as pickle
 from geopy.distance import geodesic
 import numpy as np
 import math
+import requests
 
 
 parser = reqparse.RequestParser()
@@ -417,12 +419,12 @@ class ParsePolygons(Resource):
         #
         # parse_polygons()
         #
-        check_point_is_in_polygon()
+        # check_point_is_in_polygon()
 
-        count_avg_sq()
-
-        count_avg_coeff()
-
+        # count_avg_sq()
+        #
+        # count_avg_coeff()
+        #
         parse_ao()
 
         return {'message': 'Successfully updated districts'}, 200
@@ -568,3 +570,73 @@ class GetTopDistricts(Resource):
     def get(self):
         results = DistrictModel.top()
         return [r.as_dict() for r in results], 200
+
+
+
+# class MatchMl(Resource):
+#     def get(self):
+#         d = {'None': 0, 'block': 1, 'brick': 2, 'monolith': 3, 'monolithBrick': 4, 'old': 5, 'panel': 6, 'stalin': 7,
+#          'wood': 8}
+#
+#         flats = RealtyModel.query.filter(and_(RealtyModel.area_kitchen != None, RealtyModel.building_material_type != None))
+#         URL = "http://realty.pythonanywhere.com/estimate"
+#         count = 0
+#
+#         for i in flats:
+#             try:
+#                 count+=1
+#                 PARAMS = {'wallsMaterial': d[i.building_material_type], 'floorNumber': i.floor_number, 'floorsTotal': i.floors_count, 'totalArea': i.area, 'kitchenArea': i.area_kitchen, 'latitude': i.latitude, 'longitude': i.longitude}
+#                 r = requests.get(url=URL, params=PARAMS)
+#
+#                 data = r.json()['Predicted price']
+#                 i.predicted = data
+#
+#                 print (str(count) + '/13290')
+#             except:
+#                 print('error')
+#                 continue
+#
+#             if count % 500 == 0:
+#                 RealtyModel.update_dist()
+#
+#         return {'Message': 'success'}, 200
+
+
+class CompareMlPrediction(Resource):
+    def get(self):
+        flats = RealtyModel.query.filter(and_(RealtyModel.predicted != None, RealtyModel.type == 1))
+
+        sum_flats = 0
+        sum_predicted = 0
+
+        for i in flats:
+            if i.price > 80000000.0:
+                continue
+            sum_flats += i.price
+            sum_predicted += i.predicted
+
+        return {'Rate': 100-sum_predicted/sum_flats*100}, 200
+
+
+class PriceToPredicted(Resource):
+    def get(self):
+        data = RealtyModel.return_all()
+
+        return data, 200
+
+
+alt_parser = reqparse.RequestParser()
+alt_parser.add_argument('latitude', help='Please fill in latitude', type=float, required=True, nullable=False)
+alt_parser.add_argument('longitude', help='Please fill in longitude', type=float, required=True, nullable=False)
+alt_parser.add_argument('area', help='Please fill in area', type=float, required=True, nullable=False)
+
+
+class Alternatives(Resource):
+    def get(self):
+        latitude = alt_parser.parse_args()['latitude']
+        longitude = alt_parser.parse_args()['longitude']
+        area = alt_parser.parse_args()['area']
+
+        data = RealtyModel.find_alt(latitude, longitude, area)
+
+        return {'Matching results': data}, 200

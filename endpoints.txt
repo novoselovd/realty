@@ -36,3 +36,7 @@
 29) FindLatLon. URL: /latlon. Usage: Метод GET с полем address. Возвращает координаты адреса.
 30) GetTopDistricts. URL: /top_dist. Usage: Метод GET. Возвращает округи по цене за кв.м.
 31) Estimate. URL: /estimate. Usage: Метод GET с полями wallsMaterial, floorNumber, floorsTotal, totalArea, kitchenArea, latitude, longitude. Возвращает оценку стоимости квартиры.
+32) CompareMlPrediction. URL: /mlcoeff. Usage: Метод GET. Возвращает процентную разницу на сколько цена выше предсказанной. (ограничение в 80 млн)
+33) PriceToPredicted. URL: /compare. Usage: Метод GET. Возвращает квартиры с ценами и предсказанной ценой.
+34) Alternatives. URL: /alternatives. Usage: Метод GET с полями latitude, longitude, area. Возвращает похожие по площади(+-5км)
+квартиры в радиусе 1.5 км.

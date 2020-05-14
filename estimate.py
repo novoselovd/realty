@@ -75,7 +75,7 @@ def print_metrics(prediction, val_y):
     print('Медианная абсолютная ошибка: {:.3} %'.format(median_absolute_percentage_error(val_y, prediction)))
 
 
-file_path = 'https://raw.githubusercontent.com/maxbobkov/ml_moscow_flats/master/moscow_dataset_2020.csv'
+file_path = ''
 df = pd.read_csv(file_path)
 
 df['priceMetr'] = df['price']/df['totalArea']
