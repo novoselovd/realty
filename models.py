@@ -279,7 +279,31 @@ class RealtyModel(db.Model, JsonModel):
                 'price': x.price,
                 'predicted': x.predicted,
             }
-        return {'Data': list(map(lambda x: price_to_predicted(x), RealtyModel.query.filter(and_(RealtyModel.predicted != None, RealtyModel.type == 1))))}
+
+        ret = []
+
+        res = {}
+
+        data = RealtyModel.query.filter(and_(RealtyModel.predicted != None, RealtyModel.type == 1, RealtyModel.price < 80000000))
+
+        for i in data:
+            if i.predicted-i.price not in res:
+                res[i.predicted-i.price] = i
+
+        srt = sorted(res.keys())
+
+        min = srt[-10:]
+        max = srt[:10]
+
+
+        for i in min:
+            ret.append(res[i])
+
+        for i in max:
+            ret.append(res[i])
+
+
+        return {'Data': list(map(lambda x: price_to_predicted(x), ret))}
 
     @classmethod
     def return_realty_by_id(cls, id):

@@ -536,7 +536,7 @@ class Estimate(Resource):
     def get(self):
         query = estimate_parser.parse_args()
 
-        with open('xgb.pk', 'rb') as f:
+        with open('xgb_model.pk', 'rb') as f:
             loaded_model2 = pickle.load(f)
 
         flat = pd.DataFrame({
