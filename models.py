@@ -323,7 +323,7 @@ class RealtyModel(db.Model, JsonModel):
 
         for r in sell:
             for q in rent:
-                if r.latitude == q.latitude and r.longitude == q.longitude and abs(r.area - q.area) < 5.0:
+                if r.latitude == q.latitude and r.longitude == q.longitude and abs(r.area - q.area) < 3.0:
                     if tuple([r.latitude, r.longitude]) not in res:
                         res[tuple([r.latitude, r.longitude])] = [r, q, int(r.price / (12.0 * q.price))]
                         result += 1

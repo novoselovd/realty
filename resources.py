@@ -419,12 +419,12 @@ class ParsePolygons(Resource):
         #
         # parse_polygons()
         #
-        # check_point_is_in_polygon()
+        check_point_is_in_polygon()
 
-        # count_avg_sq()
-        #
-        # count_avg_coeff()
-        #
+        count_avg_sq()
+
+        count_avg_coeff()
+
         parse_ao()
 
         return {'message': 'Successfully updated districts'}, 200
@@ -558,7 +558,6 @@ class Estimate(Resource):
         flat = flat.drop('latitude', axis=1)
         flat = flat.drop('longitude', axis=1)
 
-        # rf_prediction_flat = loaded_model1.predict(flat).round(0)
         xgb_prediction_flat = loaded_model2.predict(flat).round(0)
 
         price = xgb_prediction_flat * flat['totalArea'][0]
@@ -640,3 +639,4 @@ class Alternatives(Resource):
         data = RealtyModel.find_alt(latitude, longitude, area)
 
         return {'Matching results': data}, 200
+

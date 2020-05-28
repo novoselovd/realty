@@ -146,4 +146,3 @@ api.add_resource(resources.Alternatives, '/alternatives')
 
 
 
-

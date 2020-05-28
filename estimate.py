@@ -4,13 +4,8 @@ import dill as pickle
 import numpy as np
 from geopy.distance import geodesic
 import math
-from sklearn.metrics import mean_absolute_error, r2_score, median_absolute_error
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestRegressor
 from sklearn.preprocessing import LabelEncoder
-
-filename1 = 'rf_model.pk'
-filename2 = 'xgb_model.pk'
 
 
 def get_azimuth(latitude, longitude):
@@ -53,29 +48,7 @@ def get_azimuth(latitude, longitude):
     return round(angledeg, 2)
 
 
-def mean_absolute_percentage_error(y_true, y_pred):
-    y_true, y_pred = np.array(y_true), np.array(y_pred)
-    return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
-
-
-def median_absolute_percentage_error(y_true, y_pred):
-    y_true, y_pred = np.array(y_true), np.array(y_pred)
-    return np.median(np.abs((y_true - y_pred) / y_true)) * 100
-
-
-def print_metrics(prediction, val_y):
-    val_mae = mean_absolute_error(val_y, prediction)
-    median_AE = median_absolute_error(val_y, prediction)
-    r2 = r2_score(val_y, prediction)
-
-    print('')
-    print('R\u00b2: {:.2}'.format(r2))
-    print('')
-    print('Средняя абсолютная ошибка: {:.3} %'.format(mean_absolute_percentage_error(val_y, prediction)))
-    print('Медианная абсолютная ошибка: {:.3} %'.format(median_absolute_percentage_error(val_y, prediction)))
-
-
-file_path = ''
+file_path = 'data.csv'
 df = pd.read_csv(file_path)
 
 df['priceMetr'] = df['price']/df['totalArea']
@@ -125,24 +98,6 @@ X = df[features]
 
 train_X, val_X, train_y, val_y = train_test_split(X, y, random_state=1)
 
-
-rf_model = RandomForestRegressor(n_estimators=2000,
-                                 n_jobs=-1,
-                                 bootstrap=False,
-                                 criterion='mse',
-                                 max_features=3,
-                                 random_state=1,
-                                 max_depth=55,
-                                 min_samples_split=5
-                                 )
-
-rf_model.fit(train_X, train_y)
-
-rf_prediction = rf_model.predict(val_X).round(0)
-
-print_metrics(rf_prediction, val_y)
-
-
 xgb_model = xgb.XGBRegressor(objective ='reg:gamma',
                              learning_rate = 0.01,
                              max_depth = 45,
@@ -155,21 +110,9 @@ xgb_model.fit(train_X, train_y)
 
 xgb_prediction = xgb_model.predict(val_X).round(0)
 
-print_metrics(xgb_prediction, val_y)
+prediction = xgb_prediction
 
 
-prediction = rf_prediction * 0.5 + xgb_prediction * 0.5
-
-print_metrics(prediction, val_y)
-
-
-importances = rf_model.feature_importances_
-std = np.std([tree.feature_importances_ for tree in rf_model.estimators_],
-             axis=0)
-indices = np.argsort(importances)[::-1]
-
-print('here')
-
-with open('test1.pk', 'wb') as file:
+with open('xgb.pk', 'wb') as file:
     pickle.dump(xgb_model, file)
 

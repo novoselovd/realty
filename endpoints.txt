@@ -40,3 +40,6 @@
 33) PriceToPredicted. URL: /compare. Usage: Метод GET. Возвращает квартиры с ценами и предсказанной ценой.
 34) Alternatives. URL: /alternatives. Usage: Метод GET с полями latitude, longitude, area. Возвращает похожие по площади(+-5км)
 квартиры в радиусе 1.5 км.
+35) UpdateDatabase. URL: /update. Usage: Требуется access_token, GET запрос с полями deal_id и price. Добавляет новые объекты квартир в базу данных.
+36) CountSameAddresses. URL: /count. Usage: GET запрос. Находит предложения о продаже/аренде в одинаковых домах.
+37) ParsePolygons. URL: /polygons. Usage: Требуется access_token, GET запрос. Сопоставляет квартиры с муниципальными и административными округами, считает среднее значение окупаемости и цены за квадратный метр.
