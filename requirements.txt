@@ -62,7 +62,7 @@ instabot==0.4.2
 instapy-cli==0.0.4
 ipgetter==0.6
 ipykernel==4.5.2
-ipython==5.2.2
+ipython==7.16.3
 ipython-genutils==0.1.0
 ipywidgets==5.2.2
 itsdangerous==0.24
