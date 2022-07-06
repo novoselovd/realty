@@ -54,7 +54,7 @@ geos==0.2.2
 gitsome==0.8.4
 gunicorn==19.4.5
 haxor==0.6
-html5lib==0.9999999
+html5lib==0.999999999
 huepy==0.9.8.1
 idna==2.7
 imagesize==1.2.0
